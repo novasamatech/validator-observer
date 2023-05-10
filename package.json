@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Automate payouts",
   "main": "App.ts",
-  "license": "MIT",
   "scripts": {
     "start": "ts-node src/App.ts"
   },
