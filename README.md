@@ -21,3 +21,7 @@ Run the app:
 ```bash
 yarn start
 ```
+
+## License
+Validator Observer is available under the Apache 2.0 license. See the LICENSE file for more info.
+© Novasama Technologies GmbH 2023
