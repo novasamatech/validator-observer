@@ -1,5 +1,6 @@
 import { ApiPromise } from '@polkadot/api';
-import { SubstrateConnection } from './connection/SubstrateConnection';
+import { SubstrateConnection } from '../connection';
+import { sendTransaction } from '../utils';
 
 
 export class PayoutHelper {
@@ -23,7 +24,7 @@ export class PayoutHelper {
     async payout(validatorAddress: string, era: number, sender): Promise<void> {
 
         const transaction = this.api.tx.staking.payoutStakers(validatorAddress, era)
-        await this.sendTransaction(transaction, sender)
+        await sendTransaction(transaction, sender, this.api)
     }
 
     public async checkPayouts(validatorAddress: string, depth): Promise<number[]> {
@@ -62,38 +63,4 @@ export class PayoutHelper {
         return lastReward
     }
 
-    private async sendTransaction(transaction: any, sender: any): Promise<void> {
-        await new Promise(async (unsub) => {
-            transaction.signAndSend(sender, ({ status, events }) => {
-                console.log(`Current status is $.status}`);
-
-                if (status.isInBlock) {
-                    console.log(`Transaction included at blockHash ${status.asInBlock}`);
-                    events.filter(({ event }) =>
-                        this.api.events.system.ExtrinsicFailed.is(event)
-                    )
-                        .forEach(({ event: { data: [error, info] } }) => {
-                            if (error.isModule) {
-                                // for module errors, we have the section indexed, lookup
-                                const decoded = this.api.registry.findMetaError(error.asModule);
-                                const { docs, method, section } = decoded;
-
-                                console.log(`${section}.${method}: ${docs.join(' ')}`);
-                                unsub(info)
-                            } else {
-                                // Other, CannotLookup, BadOrigin, no extra info
-                                console.log(error.toString());
-                                unsub(error)
-                            }
-                        });
-                } else if (status.isFinalized) {
-                    console.log(`Transaction finalized at blockHash ${status.asFinalized}`);
-                    unsub(status);
-                }
-                else {
-                    console.log(`Waiting for status update... Current status is: ${status}`);
-                }
-            });
-        })
-    }
 }

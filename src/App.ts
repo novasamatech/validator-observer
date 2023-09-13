@@ -1,7 +1,8 @@
-import { SubstrateConnection } from './connection/SubstrateConnection';
+import { SubstrateConnection } from './connection';
 import { config } from './config/conf';
-import { Sender } from './Sender';
-import { PayoutHelper } from './PayoutHelper';
+import { Sender } from './utils';
+import { PayoutHelper } from './payoutHelper';
+import { VoteHelper } from './voteHelper';
 
 interface Connections {
     [network: string]: SubstrateConnection;
@@ -25,6 +26,10 @@ async function main(): Promise<void> {
         // Payout rewards
         const payout = new PayoutHelper(connections[network.name])
         await payout.payoutRewards(network.validators, sender.generateKeyringPair(), false)
+
+        // OpenGov voting
+        const voter = new VoteHelper(connections[network.name])
+        await voter.checkVotes(network, sender.generateKeyringPair())
 
         // Close connection
         await connection.disconnect();
