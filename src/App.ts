@@ -10,7 +10,7 @@ interface Connections {
 }
 
 async function main(): Promise<void> {
-    const networkType = process.argv[2] as 'RelaychainConfig' | 'AstarConfig';
+    const networkType = process.argv[2];
 
     let connections: Connections = {}
     if (!config.payoutAccount) {
