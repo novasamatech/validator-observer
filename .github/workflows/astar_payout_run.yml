@@ -1,10 +1,10 @@
-name: Make payouts
+name: Make astar payouts
 
 on:
   pull_request:
   workflow_dispatch:
   schedule:
-    - cron: "0 */2 * * *"
+    - cron: "0 0 * * MON"
 
 env:
   PAYOUTS_ACCOUNT_MNEMONIC: ${{ secrets.PAYOUTS_ACCOUNT_MNEMONIC }}
@@ -21,4 +21,4 @@ jobs:
         run: yarn install
 
       - name: Run app
-        run: yarn start:relaychain
+        run: yarn start:astar
