@@ -21,4 +21,4 @@ jobs:
         run: yarn install
 
       - name: Run app
-        run: yarn run start
+        run: yarn start:relaychain

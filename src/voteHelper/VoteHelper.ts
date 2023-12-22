@@ -1,6 +1,6 @@
 import { ApiPromise } from '@polkadot/api';
 import { SubstrateConnection } from '../connection/SubstrateConnection';
-import { NetworkConfig } from '../config/conf';
+import { RelaychainConfig } from '../config/conf';
 import { sendTransaction } from '../utils';
 import { Referendum } from './referendum';
 import { AbstainVote, StandardVote, TrackVotes, Vote } from './votes';
@@ -12,7 +12,7 @@ export class VoteHelper {
         this.api = connection.getApi();
     }
 
-    async checkVotes(network: NetworkConfig, sender): Promise<void> {
+    async checkVotes(network: RelaychainConfig, sender): Promise<void> {
         const ongoingReferena = await this.getOngoingReferenda();
         const potentialVotes = await this.getPotentialVotes(network, ongoingReferena);
 
@@ -47,7 +47,7 @@ export class VoteHelper {
         return accountVotes;
     }
 
-    async getPotentialVotes(network: NetworkConfig, referendums: Referendum[]): Promise<Vote[]> {
+    async getPotentialVotes(network: RelaychainConfig, referendums: Referendum[]): Promise<Vote[]> {
         const uniqueVotes = new Set<number>();
         const newVoteForReferenda: Vote[] = [];
         const abstainVotes: Vote[] = [];

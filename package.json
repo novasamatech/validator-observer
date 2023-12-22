@@ -4,7 +4,8 @@
   "description": "Automate payouts",
   "main": "App.ts",
   "scripts": {
-    "start": "ts-node src/App.ts"
+    "start:relaychain": "ts-node src/App.ts 'Relaychain'",
+    "start:astar": "ts-node src/App.ts 'Astar'"
   },
   "dependencies": {
     "@polkadot/api": "^10.6.1",
