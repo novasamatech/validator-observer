@@ -59,7 +59,7 @@ export const config = new Config([
     ),
     new AstarConfig(
         'Astar',
-        'wss://rpc.astar.network',
+        'wss://astar.api.onfinality.io/ws?apikey=8422f83b-f495-4e4b-b3f5-1d1c88a3f940',
         ['X4Hsp6EcxNPypWidz4xuVJhoafLdpShzy5ADpLAJZdqeKwz']
     ),
 ], process.env.PAYOUTS_ACCOUNT_MNEMONIC);

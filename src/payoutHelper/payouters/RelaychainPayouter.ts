@@ -3,7 +3,6 @@ import { PayoutHelper } from "../PayoutHelper";
 
 export class RelychainPayoutHelper extends PayoutHelper {
 
-    // other methods here
     async payoutRewards(validators: string[], sender, depth: boolean = false): Promise<void> {
 
         for (const validator of validators) {
