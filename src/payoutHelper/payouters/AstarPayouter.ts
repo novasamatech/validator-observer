@@ -14,12 +14,10 @@ export class AstarPayoutHelper extends PayoutHelper {
     async payoutRewards(validators: string[], sender, depth: boolean = false): Promise<void> {
         for (const validator of validators) {
             const dappAddress = await this.getDAPPAddress(validator)
-            console.log(dappAddress)
             const currentEra = await this.getCurrentEra()
             if (dappAddress){
-                const erasToPayout = await this.grabErasToReward(dappAddress, currentEra)
-                console.log(erasToPayout)
-                await this.makePayout(dappAddress, erasToPayout, sender)
+                const erasToPayout = await this.getErasToReward(dappAddress, currentEra)
+                await this.processPayout(dappAddress, erasToPayout, sender)
             }
         }
     }
@@ -39,12 +37,11 @@ export class AstarPayoutHelper extends PayoutHelper {
         return (await this.retryApiCall(() => this.api.query.dappsStaking.currentEra())).toString()
     }
 
-    private async grabErasToReward(validatorAddress: string, currentEra: string): Promise<Array<string>> {
-        const returnArray: Array<string> = [];
-        // Decrease current era in order to not call for the current era
-        let era = Number(currentEra) - 1;
+    private async getErasToReward(validatorAddress: string, currentEra: string): Promise<Array<string>> {
+        const rewardEras: Array<string> = [];
+        let era = Number(currentEra) - 1; // in order to not get from currentEra
     
-        while (era >= 0) {
+        for (; era >= 0; era--) {
             const contractEraStake = await this.retryApiCall(() => 
                 this.api.query.dappsStaking.contractEraStake(
                     this.astarRuntimeSmartContract(validatorAddress),
@@ -55,26 +52,22 @@ export class AstarPayoutHelper extends PayoutHelper {
     
             if (typeof data === 'object' && data !== null && 'contractRewardClaimed' in data) {
                 if (data.contractRewardClaimed === false) {
-                    returnArray.push(era.toString());
-                } else {
-                    console.log(`Found era with paid out rewards: ${era}`)
+                    rewardEras.push(era.toString());
+                } else if (data.contractRewardClaimed === true) {
                     break;
                 }
             }
-            era--;
         }
     
-        return returnArray;
+        return rewardEras;
     }
 
-    private async makePayout(validatorAddress: string, reward_eras: Array<string>, sender: any) {
+    private async processPayout(validatorAddress: string, rewardEras: Array<string>, sender: any) {
         const transactions: any = [];
-        
-        // Reverse the order of reward_eras
-        reward_eras = reward_eras.reverse();
+        rewardEras = rewardEras.reverse();
     
-        for (let i = 0; i < reward_eras.length; i += 10) {
-            const batch = reward_eras.slice(i, i + 10).map(era => 
+        for (let i = 0; i < rewardEras.length; i += 10) {
+            const batch = rewardEras.slice(i, i + 10).map(era => 
                 this.api.tx.dappsStaking.claimDapp(
                     this.astarRuntimeSmartContract(validatorAddress),
                     this.eraIndex(Number(era))
@@ -84,7 +77,6 @@ export class AstarPayoutHelper extends PayoutHelper {
         }
     
         for (const transaction of transactions) {
-            console.log(sender.address)
             await sendTransaction(transaction, sender, this.api);
         }
     }
