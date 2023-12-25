@@ -1,18 +1,35 @@
+/**
+ * Base class for network configuration.
+ */
 export class BaseNetworkConfig {
     name: string;
     endpoint: string;
 
+    /**
+     * @param {string} name - The name of the network.
+     * @param {string} endpoint - The endpoint of the network.
+     */
     constructor(name: string, endpoint: string) {
         this.name = name;
         this.endpoint = endpoint;
     }
 }
 
+/**
+ * Class for Relaychain network configuration.
+ */
 export class RelaychainConfig extends BaseNetworkConfig {
     validators: string[];
     votersAccounts: string[];
     voteAmount: number;
 
+    /**
+     * @param {string} name - The name of the network.
+     * @param {string} endpoint - The endpoint of the network.
+     * @param {string[]} validators - The validators of the network.
+     * @param {string[]} votersAccounts - The voters accounts of the network.
+     * @param {number} voteAmount - The vote amount of the network.
+     */
     constructor(name: string, endpoint: string, validators: string[], votersAccounts: string[], voteAmount: number) {
         super(name, endpoint);
         this.validators = validators;
@@ -21,27 +38,48 @@ export class RelaychainConfig extends BaseNetworkConfig {
     }
 }
 
+/**
+ * Class for Astar network configuration.
+ */
 export class AstarConfig extends BaseNetworkConfig {
     validators: string[];
 
+    /**
+     * @param {string} name - The name of the network.
+     * @param {string} endpoint - The endpoint of the network.
+     * @param {string[]} validators - The validators of the network.
+     */
     constructor(name: string, endpoint: string, validators: string[]) {
         super(name, endpoint);
         this.validators = validators;
     }
 }
 
+/**
+ * Type for Network configuration.
+ */
 export type NetworkConfig = RelaychainConfig | AstarConfig;
 
+/**
+ * Class for the main configuration.
+ */
 export class Config {
     networks: NetworkConfig[];
     payoutAccount: string | undefined;
 
+    /**
+     * @param {NetworkConfig[]} networks - The networks of the configuration.
+     * @param {string | undefined} payoutAccount - The payout account of the configuration.
+     */
     constructor(networks: NetworkConfig[], payoutAccount: string | undefined) {
         this.networks = networks;
         this.payoutAccount = payoutAccount;
     }
 }
 
+/**
+ * The main configuration object.
+ */
 export const config = new Config([
     new RelaychainConfig(
         'Kusama',
