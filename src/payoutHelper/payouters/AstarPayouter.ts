@@ -62,12 +62,12 @@ export class AstarPayoutHelper extends PayoutHelper {
         return rewardEras;
     }
 
-    private async processPayout(validatorAddress: string, rewardEras: Array<string>, sender: any) {
+    private async processPayout(validatorAddress: string, rewardEras: Array<string>, sender: any, batch_size: number = 20) {
         const transactions: any = [];
         rewardEras = rewardEras.reverse();
     
-        for (let i = 0; i < rewardEras.length; i += 10) {
-            const batch = rewardEras.slice(i, i + 10).map(era => 
+        for (let i = 0; i < rewardEras.length; i += batch_size) {
+            const batch = rewardEras.slice(i, i + batch_size).map(era => 
                 this.api.tx.dappsStaking.claimDapp(
                     this.astarRuntimeSmartContract(validatorAddress),
                     this.eraIndex(Number(era))
