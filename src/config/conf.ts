@@ -17,7 +17,8 @@ export const config: Config = {
             name: 'Kusama',
             endpoint: 'wss://kusama-rpc.polkadot.io',
             validators: [
-                'DhK6qU2U5kDWeJKvPRtmnWRs8ETUGZ9S9QmNmQFuzrNoKm4'
+                'DhK6qU2U5kDWeJKvPRtmnWRs8ETUGZ9S9QmNmQFuzrNoKm4',
+                'EtETk1FbrDg7FoAfkREuXT7xHxCjbEf28sBvWf6zfB5wFyV'
             ],
             votersAccounts: [
                 'Day71GSJAxUUiFic8bVaWoAczR3Ue3jNonBZthVHp2BKzyJ', // Day_7
