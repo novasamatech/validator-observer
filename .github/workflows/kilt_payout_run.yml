@@ -1,0 +1,24 @@
+name: Make kilt payouts
+
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * MON"
+
+env:
+  PAYOUTS_ACCOUNT_MNEMONIC: ${{ secrets.PAYOUTS_ACCOUNT_MNEMONIC }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run app
+        run: yarn start:kilt

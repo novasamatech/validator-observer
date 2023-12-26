@@ -56,6 +56,23 @@ export class AstarConfig extends BaseNetworkConfig {
 }
 
 /**
+ * Class for Kilt network configuration.
+ */
+export class KiltConfig extends BaseNetworkConfig {
+    validators: string[];
+
+    /**
+     * @param {string} name - The name of the network.
+     * @param {string} endpoint - The endpoint of the network.
+     * @param {string[]} validators - The validators of the network.
+     */
+    constructor(name: string, endpoint: string, validators: string[]) {
+        super(name, endpoint);
+        this.validators = validators;
+    }
+}
+
+/**
  * Type for Network configuration.
  */
 export type NetworkConfig = RelaychainConfig | AstarConfig;
@@ -100,4 +117,9 @@ export const config = new Config([
         'wss://astar.api.onfinality.io/ws?apikey=8422f83b-f495-4e4b-b3f5-1d1c88a3f940',
         ['X4Hsp6EcxNPypWidz4xuVJhoafLdpShzy5ADpLAJZdqeKwz']
     ),
+    new KiltConfig(
+        'Kilt',
+        'wss://kilt-rpc.dwellir.com',
+        ['4p34QYxYJZEP8ks2XZ6kNE5j8bP3SsDtE1MVXNZ6anFvvu7f']
+    )
 ], process.env.PAYOUTS_ACCOUNT_MNEMONIC);
