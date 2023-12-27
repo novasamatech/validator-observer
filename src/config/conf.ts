@@ -120,6 +120,6 @@ export const config = new Config([
     new KiltConfig(
         'Kilt',
         'wss://kilt-rpc.dwellir.com',
-        ['4p34QYxYJZEP8ks2XZ6kNE5j8bP3SsDtE1MVXNZ6anFvvu7f']
+        ['4sPMk6DgLbaYHaDKWpwFJQVBv3GupqHJRFWngHeALUrv37x9']
     )
 ], process.env.PAYOUTS_ACCOUNT_MNEMONIC);
