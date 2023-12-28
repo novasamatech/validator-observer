@@ -101,5 +101,3 @@ export const config = new Config([
         ['X4Hsp6EcxNPypWidz4xuVJhoafLdpShzy5ADpLAJZdqeKwz']
     ),
 ], process.env.PAYOUTS_ACCOUNT_MNEMONIC);
-
-};
