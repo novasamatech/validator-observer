@@ -1,11 +1,15 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
 
 export class SubstrateConnection {
-    private api: ApiPromise;
+    private api!: ApiPromise;
 
     constructor(endpoint: string) {
+        this.initialize(endpoint);
+    }
+
+    private async initialize(endpoint: string): Promise<void> {
         const provider = new WsProvider(endpoint);
-        this.api = new ApiPromise({ provider });
+        this.api = new ApiPromise({ provider: provider });
     }
 
     async connect(): Promise<void> {

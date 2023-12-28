@@ -1,66 +1,49 @@
 import { ApiPromise } from '@polkadot/api';
 import { SubstrateConnection } from '../connection';
-import { sendTransaction } from '../utils';
 
+/**
+ * Abstract class PayoutHelper that provides a structure for handling payouts.
+ */
+export abstract class PayoutHelper {
+    protected api: ApiPromise;
 
-export class PayoutHelper {
-    private api: ApiPromise;
-
+    /**
+     * Constructor for the PayoutHelper class.
+     * @param connection - The connection to the Substrate node.
+     */
     constructor(connection: SubstrateConnection) {
         this.api = connection.getApi();
     }
 
-    async payoutRewards(validators: string[], sender, depth: boolean = false): Promise<void> {
+    /**
+     * Abstract method to payout rewards for the given validators.
+     * @param validators - The validators to payout rewards for.
+     * @param sender - The sender of the transaction.
+     * @param depth - Whether to check the history for unclaimed rewards.
+     * @returns A promise that resolves when the rewards have been paid out.
+     */
+    public abstract payoutRewards(validators: string[], sender, depth: boolean): Promise<void>;
 
-        for (const validator of validators) {
-            const unclaimedPayouts = await this.checkPayouts(validator, depth);
-
-            for (const payout of unclaimedPayouts) {
-                await this.payout(validator, payout, sender);
+    /**
+     * Method to retry API calls in case of failure.
+     * @param apiCall - The API call to retry.
+     * @param maxRetries - The maximum number of retries.
+     * @param retry_timeout - The timeout between retries.
+     * @returns A promise that resolves with the result of the API call.
+     */
+    public async retryApiCall<T>(apiCall: () => Promise<T>, maxRetries: number = 3, retry_timeout: number = 2000): Promise<T> {
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                return await apiCall();
+            } catch (error) {
+                console.error(`Attempt ${i+1} failed with error: ${error}`);
+                await this.api.connect();
+                await new Promise(resolve => setTimeout(resolve, retry_timeout));
+                if (i === maxRetries - 1) {
+                    throw new Error(`Failed after ${maxRetries} attempts: ${error}`);
+                }
             }
         }
+        throw new Error('All retries failed');
     }
-
-    async payout(validatorAddress: string, era: number, sender): Promise<void> {
-
-        const transaction = this.api.tx.staking.payoutStakers(validatorAddress, era)
-        await sendTransaction(transaction, sender, this.api)
-    }
-
-    public async checkPayouts(validatorAddress: string, depth): Promise<number[]> {
-
-        // @ts-ignore
-        const currentEra = (await this.api.query.staking.activeEra()).unwrapOr(null);
-
-        const lastReward = await this.getLastReward(validatorAddress, depth)
-
-        const numOfPotentialUnclaimedPayouts = currentEra.index - lastReward - 1;
-        const unclaimedPayouts: number[] = []
-        for (let i = 1; i <= numOfPotentialUnclaimedPayouts; i++) {
-
-            const idx = lastReward + i;
-            const exposure = (await this.api.query.staking.erasStakers(idx, validatorAddress)).toJSON();
-            if (Number(exposure!['total']) > 0) {
-                unclaimedPayouts.push(idx)
-            }
-        }
-
-        return unclaimedPayouts
-    }
-
-    private async getLastReward(validatorAddress: string, isHistoryCheckForced = false): Promise<number> {
-
-        const ledger = (await this.api.derive.staking.account(validatorAddress)).stakingLedger
-
-        let lastReward: number;
-        if (isHistoryCheckForced || ledger.claimedRewards.length == 0) {
-            // @ts-ignore
-            lastReward = this.api.consts.staking.historyDepth.toNumber();
-        } else {
-            lastReward = ledger.claimedRewards.pop().toNumber();
-        }
-
-        return lastReward
-    }
-
 }
