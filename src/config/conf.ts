@@ -84,7 +84,7 @@ export const config = new Config([
     new RelaychainConfig(
         'Kusama',
         'wss://kusama-rpc.polkadot.io',
-        ['DhK6qU2U5kDWeJKvPRtmnWRs8ETUGZ9S9QmNmQFuzrNoKm4'],
+        ['DhK6qU2U5kDWeJKvPRtmnWRs8ETUGZ9S9QmNmQFuzrNoKm4', 'EtETk1FbrDg7FoAfkREuXT7xHxCjbEf28sBvWf6zfB5wFyV'],
         ['Day71GSJAxUUiFic8bVaWoAczR3Ue3jNonBZthVHp2BKzyJ', 'DCZyhphXsRLcW84G9WmWEXtAA8DKGtVGSFZLJYty8Ajjyfa'],
         110_000_000_000_000
     ),
@@ -101,3 +101,5 @@ export const config = new Config([
         ['X4Hsp6EcxNPypWidz4xuVJhoafLdpShzy5ADpLAJZdqeKwz']
     ),
 ], process.env.PAYOUTS_ACCOUNT_MNEMONIC);
+
+};
