@@ -19,7 +19,9 @@ yarn install
 
 Run the app:
 ```bash
-yarn start
+yarn start:relaychain
+yarn start:astar
+yarn start:kilt
 ```
 
 ## License
