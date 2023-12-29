@@ -1,3 +1,4 @@
+import { Validator } from "../../config/conf";
 import { sendTransaction } from "../../utils";
 import { PayoutHelper } from "../PayoutHelper";
 
@@ -13,10 +14,10 @@ export class KiltPayoutHelper extends PayoutHelper {
      * @param depth - Whether to payout rewards for all eras or just the current era.
      * @returns A promise that resolves when the rewards have been paid out.
      */
-    async payoutRewards(validators: string[], sender, depth: boolean = false): Promise<void> {
+    async payoutRewards(validators: Validator[], sender, depth: boolean = false): Promise<void> {
         for (const validator of validators) {
-            await this.incrementCollatorRewards(validator, sender);
-            await this.claimRewards(validator, sender);
+            await this.incrementCollatorRewards(validator.address, sender);
+            await this.claimRewards(validator.address, sender);
         }
     }
 

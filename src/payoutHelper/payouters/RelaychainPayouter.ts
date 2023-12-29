@@ -1,3 +1,4 @@
+import { Validator } from "../../config/conf";
 import { sendTransaction } from "../../utils";
 import { PayoutHelper } from "../PayoutHelper";
 
@@ -13,11 +14,11 @@ export class RelychainPayoutHelper extends PayoutHelper {
      * @param depth - Whether to check the history for unclaimed rewards.
      * @returns A promise that resolves when the rewards have been paid out.
      */
-    async payoutRewards(validators: string[], sender, depth: boolean = false): Promise<void> {
+    async payoutRewards(validators: Validator[], sender, depth: boolean = false): Promise<void> {
         for (const validator of validators) {
-            const unclaimedPayouts = await this.checkPayouts(validator, depth);
+            const unclaimedPayouts = await this.checkPayouts(validator.address, depth);
             for (const payout of unclaimedPayouts) {
-                await this.payout(validator, payout, sender);
+                await this.payout(validator.address, payout, sender);
             }
         }
     }

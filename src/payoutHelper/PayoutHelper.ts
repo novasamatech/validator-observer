@@ -1,5 +1,6 @@
 import { ApiPromise } from '@polkadot/api';
 import { SubstrateConnection } from '../connection';
+import { Validator } from '../config/conf';
 
 /**
  * Abstract class PayoutHelper that provides a structure for handling payouts.
@@ -22,7 +23,7 @@ export abstract class PayoutHelper {
      * @param depth - Whether to check the history for unclaimed rewards.
      * @returns A promise that resolves when the rewards have been paid out.
      */
-    public abstract payoutRewards(validators: string[], sender, depth: boolean): Promise<void>;
+    public abstract payoutRewards(validators: Validator[], sender, depth: boolean): Promise<void>;
 
     /**
      * Method to retry API calls in case of failure.

@@ -1,3 +1,4 @@
+import { Validator } from "../../config/conf";
 import { sendTransaction } from "../../utils";
 import { PayoutHelper } from "../PayoutHelper";
 
@@ -31,9 +32,9 @@ export class AstarPayoutHelper extends PayoutHelper {
      * @param depth - Whether to payout rewards for all eras or just the current era.
      * @returns A promise that resolves when the rewards have been paid out.
      */
-    async payoutRewards(validators: string[], sender, depth: boolean = false): Promise<void> {
+    async payoutRewards(validators: Validator[], sender, depth: boolean = false): Promise<void> {
         for (const validator of validators) {
-            const dappAddress = await this.getDAPPAddress(validator)
+            const dappAddress = await this.getDAPPAddress(validator.address)
             const currentEra = await this.getCurrentEra()
             if (dappAddress){
                 const erasToPayout = await this.getErasToReward(dappAddress, currentEra)
