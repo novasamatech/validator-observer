@@ -1,6 +1,6 @@
 import { ApiPromise } from '@polkadot/api';
 import { SubstrateConnection } from '../connection/SubstrateConnection';
-import { RelaychainConfig } from '../config/conf';
+import { RelaychainConfig, Validator } from '../config/conf';
 import { sendTransaction } from '../utils';
 import { Referendum } from './referendum';
 import { AbstainVote, StandardVote, TrackVotes, Vote } from './votes';
@@ -14,13 +14,15 @@ export class VoteHelper {
 
     async checkVotes(network: RelaychainConfig, sender): Promise<void> {
         const ongoingReferena = await this.getOngoingReferenda();
-        const potentialVotes = await this.getPotentialVotes(network, ongoingReferena);
 
         for (const validator of network.validators) {
-            const newVotes = await this.decideHowToVote(validator, potentialVotes);
+            if (!validator.voteEnabled) continue;
+            
+            const potentialVotes = await this.getPotentialVotes(validator, ongoingReferena);
+            const newVotes = await this.decideHowToVote(validator.address, potentialVotes);
 
             for (const vote of newVotes) {
-                await this.voteForReferenda(vote, sender, validator, network.voteAmount);
+                await this.voteForReferenda(vote, sender, validator.address, validator.voteAmount);
             }
         }
     }
@@ -47,13 +49,13 @@ export class VoteHelper {
         return accountVotes;
     }
 
-    async getPotentialVotes(network: RelaychainConfig, referendums: Referendum[]): Promise<Vote[]> {
+    async getPotentialVotes(validator: Validator, referendums: Referendum[]): Promise<Vote[]> {
         const uniqueVotes = new Set<number>();
         const newVoteForReferenda: Vote[] = [];
         const abstainVotes: Vote[] = [];
         const referendaNumbers = new Set(referendums.map(referendum => referendum.number));
 
-        for (const account of network.votersAccounts) {
+        for (const account of validator.votersAccounts) {
             const voterVotes = await this.getAccountVotes(account);
             const relevantVotes = voterVotes.filter(vote => referendaNumbers.has(vote.referendaNumber));
 
@@ -73,7 +75,7 @@ export class VoteHelper {
                         SplitAbstain: {
                             aye: "0",
                             nay: "0",
-                            abstain: network.voteAmount,
+                            abstain: validator.voteAmount,
                         },
                     }
                 });
@@ -102,7 +104,7 @@ export class VoteHelper {
         return true;
     }
 
-    async voteForReferenda(vote: Vote, sender, validator, balance): Promise<void> {
+    async voteForReferenda(vote: Vote, sender, validator: string, balance: number): Promise<void> {
         const constructedVote = vote.createPayload(this.api, balance);
         const voteTransaction = this.api.tx.convictionVoting.vote(vote.referendaNumber, constructedVote);
         const proxyTransaction = this.api.tx.proxy.proxy(validator, 'Governance', voteTransaction);
