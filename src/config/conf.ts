@@ -120,6 +120,18 @@ export const config = new Config([
             }
         ]
     ),
+    new RelaychainConfig(
+        'Polkadot',
+        'wss://polkadot-rpc.dwellir.com',
+        [
+            {
+                address: '127zarPDhVzmCXVQ7Kfr1yyaa9wsMuJ74GJW9Q7ezHfQEgh6',
+                votersAccounts: ['15cfSaBcTxNr8rV59cbhdMNCRagFr3GE6B3zZRsCp4QHHKPu', '13EyMuuDHwtq5RD6w3psCJ9WvJFZzDDion6Fd2FVAqxz1g7K'],
+                voteAmount: 50_000_000_000_000,
+                voteEnabled: true
+            }
+        ]
+    ),
     new AstarConfig(
         'Astar',
         'wss://astar.api.onfinality.io/ws?apikey=8422f83b-f495-4e4b-b3f5-1d1c88a3f940',
