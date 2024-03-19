@@ -107,7 +107,6 @@ export class AstarPayoutHelper extends PayoutHelper {
      */
     private async processPayout(dappAddress: string, rewardEras: Array<string>, sender: any, batch_size: number = 20) {
         const transactions: any = [];
-        console.log(sender.address.toString())
         rewardEras = rewardEras.reverse();
 
         for (let i = 0; i < rewardEras.length; i += batch_size) {
