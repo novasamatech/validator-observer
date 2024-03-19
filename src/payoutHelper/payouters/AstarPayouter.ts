@@ -6,7 +6,7 @@ import { PayoutHelper } from "../PayoutHelper";
  * AstarPayoutHelper is a class that extends PayoutHelper and provides methods to handle payouts on the Astar network.
  */
 export class AstarPayoutHelper extends PayoutHelper {
-    
+
     /**
      * Converts an era number to a u32 type.
      * @param era - The era number.
@@ -18,11 +18,11 @@ export class AstarPayoutHelper extends PayoutHelper {
 
     /**
      * Creates an AstarPrimitivesDappStakingSmartContract type with the given validator address.
-     * @param dappAddress - The validator address.
+     * @param dappAddress - The dapp address.
      * @returns The AstarPrimitivesDappStakingSmartContract type.
      */
     private astarRuntimeSmartContract(dappAddress: string) {
-        return this.api.createType('AstarPrimitivesDappStakingSmartContract', {'Evm': dappAddress});
+        return this.api.createType('AstarPrimitivesDappStakingSmartContract', { 'Evm': dappAddress });
     }
 
     /**
@@ -35,9 +35,8 @@ export class AstarPayoutHelper extends PayoutHelper {
     async payoutRewards(validators: Validator[], sender, depth: boolean = false): Promise<void> {
         for (const validator of validators) {
             const dappAddress = await this.getDAPPAddress(validator.address)
-            const currentEra = await this.getCurrentEra()
-            if (dappAddress){
-                const erasToPayout = await this.getErasToReward(dappAddress, currentEra)
+            if (dappAddress) {
+                const erasToPayout = await this.getErasToReward(dappAddress)
                 await this.processPayout(dappAddress, erasToPayout, sender)
             }
         }
@@ -49,7 +48,7 @@ export class AstarPayoutHelper extends PayoutHelper {
      * @returns A promise that resolves with the DAPP address or undefined if it doesn't exist.
      */
     private async getDAPPAddress(validatorAddress: string): Promise<string | undefined> {
-        const dappAccounts = await this.retryApiCall(() => 
+        const dappAccounts = await this.retryApiCall(() =>
             this.api.query.dappStaking.integratedDApps.entries()
         );
         for (const [key, value] of dappAccounts) {
@@ -65,59 +64,42 @@ export class AstarPayoutHelper extends PayoutHelper {
     }
 
     /**
-     * Gets the current era.
-     * @returns A promise that resolves with the current era.
-     */
-    private async getCurrentEra(): Promise<string> {
-        const eraInfo = await this.retryApiCall(() => this.api.query.dappStaking.currentEraInfo());
-        const eraInfoJson = eraInfo.toJSON() as { currentStakeAmount?: { era?: string } };
-
-        if (eraInfoJson.currentStakeAmount && eraInfoJson.currentStakeAmount.era) {
-            return eraInfoJson.currentStakeAmount.era.toString();
-        } else {
-            throw new Error('Invalid era information');
-        }
-    }
-
-    /**
-     * Gets the eras to reward for the given validator address and current era.
-     * @param dappAddress - The validator address.
-     * @param currentEra - The current era.
+     * Gets the eras to reward for the given dapp.
+     * @param dappAddress - The dapp address.
      * @returns A promise that resolves with an array of eras to reward.
      */
-    private async getErasToReward(dappAddress: string, currentEra: string): Promise<Array<string>> {
+    private async getErasToReward(dappAddress: string): Promise<Array<string>> {
         const rewardEras: Array<string> = [];
-        const dappInfo = await this.api.query.dappStaking.integratedDApps({ Evm: dappAddress })
-        const ourDappId = (dappInfo as any).unwrap().id.toNumber()
-        
-        const rewardsByEra = await this.api.query.dappStaking.dAppTiers.entries()
-        
-        console.log("Dapp eras to claim:")
+        const dappInfo = await this.api.query.dappStaking.integratedDApps({ Evm: dappAddress });
+        const ourDappId = (dappInfo as any).unwrap().id.toNumber();
+
+        const rewardsByEra = await this.api.query.dappStaking.dAppTiers.entries();
+
         rewardsByEra.forEach(([era, tierRewards]) => {
-        if ((tierRewards as any).isNone) return
-            
-            const tierDapps = (tierRewards as any).unwrap().dapps
-            const dapps: Array<{dappId: number, tierId: number}> = [];
-                tierDapps.forEach((value: any, key: any) =>
+            if ((tierRewards as any).isNone) return;
+
+            const tierDapps = (tierRewards as any).unwrap().dapps;
+            const dapps: Array<{ dappId: number, tierId: number }> = [];
+            tierDapps.forEach((value, key) => {
                 dapps.push({
                     dappId: key.toNumber(),
                     tierId: value.toNumber(),
-                })
-                );
-            
-            const ourUnclaimedTier = dapps.find(({dappId, tierId}) => dappId == ourDappId)
-            if (ourUnclaimedTier != undefined) {
-                rewardEras.push((era.toHuman() as string)[0])
-                console.log(`${era.toHuman()}`)
+                });
+            });
+
+            const ourUnclaimedTier = dapps.find(({ dappId }) => dappId === ourDappId);
+            if (ourUnclaimedTier) {
+                const eraHumanReadable = era.toHuman() as string;
+                rewardEras.push(eraHumanReadable[0]);
             }
-        })
-    
+        });
+
         return rewardEras;
     }
 
     /**
-     * Processes the payout for the given validator address and reward eras.
-     * @param dappAddress - The validator address.
+     * Processes the payout for the given dapp address and reward eras.
+     * @param dappAddress - The dapp address.
      * @param rewardEras - The reward eras.
      * @param sender - The sender of the transaction.
      * @param batch_size - The size of the batch of transactions to send.
@@ -127,9 +109,9 @@ export class AstarPayoutHelper extends PayoutHelper {
         const transactions: any = [];
         console.log(sender.address.toString())
         rewardEras = rewardEras.reverse();
-    
+
         for (let i = 0; i < rewardEras.length; i += batch_size) {
-            const batch = rewardEras.slice(i, i + batch_size).map(era => 
+            const batch = rewardEras.slice(i, i + batch_size).map(era =>
                 this.api.tx.dappStaking.claimDappReward(
                     this.astarRuntimeSmartContract(dappAddress),
                     this.eraIndex(Number(era))
@@ -137,7 +119,7 @@ export class AstarPayoutHelper extends PayoutHelper {
             )
             transactions.push(this.api.tx.utility.batch(batch));
         }
-    
+
         for (const transaction of transactions) {
             await sendTransaction(transaction, sender, this.api);
         }
