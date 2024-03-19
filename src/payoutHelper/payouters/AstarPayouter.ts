@@ -52,11 +52,11 @@ export class AstarPayoutHelper extends PayoutHelper {
             this.api.query.dappStaking.integratedDApps.entries()
         );
         for (const [key, value] of dappAccounts) {
-            const onchainValidatorAddress = value.toJSON();
-            if (typeof onchainValidatorAddress === 'object' && onchainValidatorAddress !== null && 'owner' in onchainValidatorAddress && onchainValidatorAddress.owner === validatorAddress) {
-                const serializedData = key.toHuman();
-                if (serializedData && typeof serializedData[0] === 'object' && serializedData[0] !== null && 'Evm' in serializedData[0]) {
-                    return serializedData[0].Evm?.toString();
+            const onchainValidatorAddress = value.toJSON() as { owner?: string };
+            if (onchainValidatorAddress.owner === validatorAddress) {
+                const serializedData = key.toHuman() as [{ Evm?: string }];
+                if ('Evm' in serializedData[0]) {
+                    return serializedData[0].Evm;
                 }
             }
         }
