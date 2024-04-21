@@ -68,12 +68,14 @@ export class RelychainPayoutHelper extends PayoutHelper {
     private async getLastReward(validatorAddress: string, isHistoryCheckForced = false): Promise<number> {
         const ledger = (await this.api.derive.staking.account(validatorAddress)).stakingLedger;
         let lastReward: number;
+        const rewards = ledger.claimedRewards || ledger.legacyClaimedRewards; // Workaround for the Kusama upgrade
+        // TODO: Remove the workaround and check the logic for reward payout
 
-        if (isHistoryCheckForced || ledger.claimedRewards.length == 0) {
+        if (isHistoryCheckForced || rewards.length == 0) {
             // @ts-ignore
             lastReward = this.api.consts.staking.historyDepth.toNumber();
         } else {
-            lastReward = ledger.claimedRewards.pop().toNumber();
+            lastReward = rewards.pop().toNumber();
         }
         return lastReward;
     }
