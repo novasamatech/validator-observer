@@ -4,12 +4,12 @@ import { sendTransaction } from "../../utils";
 import { PayoutHelper } from "../PayoutHelper";
 
 /***
- * New logic to handle payouts if eraStakersOverview exists.
+ * New logic to handle payouts if erasStakersOverview exists.
  */
 export class NewRelaychainPayoutLogic extends PayoutHelper {
 
     /**
-     * New method to handle payouts if eraStakersOverview exists.
+     * New method to handle payouts if erasStakersOverview exists.
      * @param validators - The validators to payout rewards for.
      * @param sender - The sender of the transaction.
      * @param depth - Whether to check the history for unclaimed rewards.
