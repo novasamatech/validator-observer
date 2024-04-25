@@ -1,12 +1,19 @@
 import { Validator } from "../../config/conf";
 import { sendTransaction } from "../../utils";
 import { PayoutHelper } from "../PayoutHelper";
+import { NewRelaychainPayoutLogic } from "./NewRelaychainPayoutLogic";
+import { SubstrateConnection } from "../../connection";
 
 /**
  * RelychainPayoutHelper is a class that extends PayoutHelper and provides methods to handle payouts on the Relychain network.
  */
 export class RelychainPayoutHelper extends PayoutHelper {
+    private newPayoutLogic: NewRelaychainPayoutLogic;
 
+    constructor(api: SubstrateConnection) {
+        super(api);
+        this.newPayoutLogic = new NewRelaychainPayoutLogic(api);
+    }
     /**
      * Payout rewards for the given validators.
      * @param validators - The validators to payout rewards for.
@@ -15,10 +22,14 @@ export class RelychainPayoutHelper extends PayoutHelper {
      * @returns A promise that resolves when the rewards have been paid out.
      */
     async payoutRewards(validators: Validator[], sender, depth: boolean = false): Promise<void> {
-        for (const validator of validators) {
-            const unclaimedPayouts = await this.checkPayouts(validator.address, depth);
-            for (const payout of unclaimedPayouts) {
-                await this.payout(validator.address, payout, sender);
+        if (this.api.query.staking.erasStakersOverview) {
+            await this.newPayoutLogic.payoutRewards(validators, sender, depth);
+        } else {
+            for (const validator of validators) {
+                const unclaimedPayouts = await this.checkPayouts(validator.address, depth);
+                for (const payout of unclaimedPayouts) {
+                    await this.payout(validator.address, payout, sender);
+                }
             }
         }
     }
