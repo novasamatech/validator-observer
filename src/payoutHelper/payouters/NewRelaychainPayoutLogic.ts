@@ -16,8 +16,9 @@ export class NewRelaychainPayoutLogic extends PayoutHelper {
      */
     async payoutRewards(validators: Validator[], sender, depth: boolean = false): Promise<void> {
         const currentEra = await this.getCurrentEraNumber();
+        const eraToReward = currentEra - 1
         const historyDepth = this.getHistoryDepth();
-        const startEra = Math.max(currentEra - historyDepth, 0);
+        const startEra = Math.max(eraToReward - historyDepth, 0);
         const transactions: Array<SubmittableExtrinsic<any, any>> = [];
 
         await this.collectTransactionsForUnclaimedRewards(startEra, currentEra, validators, transactions);
@@ -56,7 +57,7 @@ export class NewRelaychainPayoutLogic extends PayoutHelper {
     private async executeTransactionsInBatches(transactions: Array<SubmittableExtrinsic<any, any>>, sender, size: number = 4): Promise<void> {
         for (let i = 0; i < transactions.length; i += size) {
             const batchTransactions = transactions.slice(i, i + size);
-            const batchTransaction = this.api.tx.utility.batch(batchTransactions);
+            const batchTransaction = this.api.tx.utility.forceBatch(batchTransactions);
             await sendTransaction(batchTransaction, sender, this.api);
         }
     }
