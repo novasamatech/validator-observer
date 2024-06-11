@@ -123,6 +123,12 @@ export const config = new Config([
                 votersAccounts: ['Day71GSJAxUUiFic8bVaWoAczR3Ue3jNonBZthVHp2BKzyJ'],
                 voteAmount: 10_000_000_000_000,
                 voteEnabled: false
+            },
+            {
+                address: 'HuehfUJoctKux1gmMaN2d62SMSZEA3cjKfX2zmJkJEaRxwo',
+                votersAccounts: ['Day71GSJAxUUiFic8bVaWoAczR3Ue3jNonBZthVHp2BKzyJ'],
+                voteAmount: 10_000_000_000_000,
+                voteEnabled: false
             }
         ]
     ),
