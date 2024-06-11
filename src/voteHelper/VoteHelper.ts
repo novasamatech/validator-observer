@@ -40,6 +40,9 @@ export class VoteHelper {
 
         for (const track of trackArray) {
             const votesInTrack = await this.api.query.convictionVoting.votingFor(accountAddress, track.trackNumber);
+            
+            if ((votesInTrack as any).isDelegating) continue;
+
             (votesInTrack as any).asCasting.votes.map((voteData) => {
                 const vote = Vote.createVote(voteData);
                 accountVotes.push(vote);
