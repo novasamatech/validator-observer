@@ -22,7 +22,7 @@ export class NewRelaychainPayoutLogic extends PayoutHelper {
         const transactions: Array<SubmittableExtrinsic<any, any>> = [];
 
         await this.collectTransactionsForUnclaimedRewards(startEra, currentEra, validators, transactions);
-        await this.executeTransactionsInBatches(transactions, sender, 4);
+        await this.executeTransactionsInBatches(transactions, sender, 2);
     }
 
     /**
