@@ -104,7 +104,7 @@ export class Config {
 export const config = new Config([
     new RelaychainConfig(
         'Kusama',
-        'wss://kusama-rpc.polkadot.io',
+        'wss://rpc-kusama.novasamatech.org',
         [
             {
                 address: 'DhK6qU2U5kDWeJKvPRtmnWRs8ETUGZ9S9QmNmQFuzrNoKm4',
@@ -140,7 +140,7 @@ export const config = new Config([
     ),
     new RelaychainConfig(
         'Polkadot',
-        'wss://polkadot-rpc.dwellir.com',
+        'wss://rpc-polkadot.novasamatech.org',
         [
             {
                 address: '127zarPDhVzmCXVQ7Kfr1yyaa9wsMuJ74GJW9Q7ezHfQEgh6',
