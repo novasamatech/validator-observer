@@ -30,7 +30,7 @@ export class VoteHelper {
     async getOngoingReferenda(): Promise<Referendum[]> {
         const referendums = await this.api.query.referenda.referendumInfoFor.entries();
         const castedReferendums = referendums.map(([key, value]) => new Referendum(key, value));
-        return castedReferendums.filter(referendum => referendum.data.ongoing && !isNaN(referendum.number));
+        return castedReferendums.filter(referendum => referendum.data.ongoing);
     }
 
     async getAccountVotes(accountAddress: string): Promise<Vote[]> {
