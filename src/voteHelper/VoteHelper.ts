@@ -17,7 +17,7 @@ export class VoteHelper {
 
         for (const validator of network.validators) {
             if (!validator.voteEnabled) continue;
-            
+
             const potentialVotes = await this.getPotentialVotes(validator, ongoingReferena);
             const newVotes = await this.decideHowToVote(validator.address, potentialVotes);
 
@@ -30,7 +30,7 @@ export class VoteHelper {
     async getOngoingReferenda(): Promise<Referendum[]> {
         const referendums = await this.api.query.referenda.referendumInfoFor.entries();
         const castedReferendums = referendums.map(([key, value]) => new Referendum(key, value));
-        return castedReferendums.filter(referendum => referendum.data.ongoing);
+        return castedReferendums.filter(referendum => referendum.data.ongoing && !isNaN(referendum.number));
     }
 
     async getAccountVotes(accountAddress: string): Promise<Vote[]> {
@@ -40,7 +40,7 @@ export class VoteHelper {
 
         for (const track of trackArray) {
             const votesInTrack = await this.api.query.convictionVoting.votingFor(accountAddress, track.trackNumber);
-            
+
             if ((votesInTrack as any).isDelegating) continue;
 
             (votesInTrack as any).asCasting.votes.map((voteData) => {
@@ -74,7 +74,8 @@ export class VoteHelper {
             if (!uniqueVotes.has(referenda.number)) {
                 // Create an abstain vote for the referenda
                 const abstainVote = new AbstainVote({
-                    referendaNumber: referenda.number, data: {
+                    referendaNumber: referenda.number,
+                    data: {
                         SplitAbstain: {
                             aye: "0",
                             nay: "0",
