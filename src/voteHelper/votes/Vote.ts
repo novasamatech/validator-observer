@@ -14,7 +14,7 @@ export abstract class Vote {
             return;
         }
         this.buildData({ ...voteData.toHuman() });
-        this.referendaNumber = Number(voteData.toHuman()[0]);
+        this.referendaNumber = Number(voteData.toHuman()[0].replace(/,/g, ''));
     }
 
     abstract createPayload(api: ApiPromise, balance: any): Codec;
