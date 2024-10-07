@@ -1,7 +1,7 @@
 export async function sendTransaction(transaction: any, sender: any, api: any): Promise<void> {
     await new Promise(async (unsub) => {
         transaction.signAndSend(sender, ({ status, events }) => {
-            console.log(`Current status is $.status}`);
+            console.log(`Current status is ${status}`);
 
             if (status.isInBlock) {
                 console.log(`Transaction included at blockHash ${status.asInBlock}`);
