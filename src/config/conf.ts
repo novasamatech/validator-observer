@@ -171,6 +171,12 @@ export const config = new Config([
                 votersAccounts: ['15cfSaBcTxNr8rV59cbhdMNCRagFr3GE6B3zZRsCp4QHHKPu'],
                 voteAmount: 1,
                 voteEnabled: false
+            },
+            {
+                address: '15cfSaBcTxNr8rV59cbhdMNCRagFr3GE6B3zZRsCp4QHHKPu',
+                votersAccounts: ['15cfSaBcTxNr8rV59cbhdMNCRagFr3GE6B3zZRsCp4QHHKPu'],
+                voteAmount: 1,
+                voteEnabled: false
             }
         ]
     ),
