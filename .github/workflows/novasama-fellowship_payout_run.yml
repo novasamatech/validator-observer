@@ -1,13 +1,10 @@
-name: Make relaychain payouts
+name: Make kilt payouts
 
 on:
-  pull_request:
   workflow_dispatch:
-  schedule:
-    - cron: "0 */2 * * *"
 
 env:
-  PAYOUTS_ACCOUNT_MNEMONIC: ${{ secrets.PAYOUTS_ACCOUNT_MNEMONIC }}
+  BUMP_ACCOUNT_MNEMONIC: ${{ secrets.BUMP_ACCOUNT_MNEMONIC }}
 
 jobs:
   build:
@@ -21,7 +18,7 @@ jobs:
         run: yarn install
 
       - name: Run app
-        run: yarn start:relaychain
+        run: yarn start:novasama
 
   telegram-notification:
     needs: [build]
@@ -35,6 +32,6 @@ jobs:
           token: ${{ secrets.TELEGRAM_TOKEN }}
           format: markdown
           message: |
-            💸 Relaychain payout failed, see logs for details:
+            💸 Kilt payout failed, see logs for details:
 
             Github run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

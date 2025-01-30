@@ -1,13 +1,12 @@
 name: Make astar payouts
 
 on:
-  pull_request:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * MON"
+    - cron: "0 /8 * * *"
 
 env:
-  PAYOUTS_ACCOUNT_MNEMONIC: ${{ secrets.PAYOUTS_ACCOUNT_MNEMONIC }}
+  BUMP_ACCOUNT_MNEMONIC: ${{ secrets.BUMP_ACCOUNT_MNEMONIC }}
 
 jobs:
   build:
@@ -21,7 +20,7 @@ jobs:
         run: yarn install
 
       - name: Run app
-        run: yarn start:astar
+        run: yarn start:fellowship
 
   telegram-notification:
     needs: [build]

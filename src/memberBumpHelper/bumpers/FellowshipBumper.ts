@@ -1,0 +1,111 @@
+import {SubstrateConnection} from "../../connection";
+import {BumpHelper} from "../BumpHelper";
+import {sendTransaction} from "../../utils";
+import * as console from "node:console";
+
+/**
+ * FellowshipBumper is a class that extends BumperHelper and provides methods bump Fellowship members
+ */
+export class FellowshipBumper extends BumpHelper {
+
+    private params;
+
+    constructor(api: SubstrateConnection) {
+        super(api);
+    }
+    /**
+     * Bump Fellowship members that may be bumped
+     *
+     * @param sender - The sender of the transaction.
+     * @returns A promise that resolves when members are bumped.
+     */
+    async bumpMembers(sender): Promise<void> {
+        let members = await this.api.query['fellowshipCore'].member.entries();
+        let membersRanks = await this.api.query['fellowshipCollective'].members.entries();
+
+        const memberRanksMap = new Map<string, string>();
+        membersRanks.forEach(([{ args: [account] }, value]) => {
+            memberRanksMap.set(account.toString(), JSON.parse(value.toString()).rank);
+        });
+
+        const currentBlockNumber = await this.getBlockNumber();
+
+        let accountsToBump: string[] = [];
+        for (const [{args: [account]}, value] of members) {
+            let fellowInfo = JSON.parse(value.toString());
+            let mayBeBumped = await this.mayBeBumped(memberRanksMap.get(account.toString()), fellowInfo, currentBlockNumber);
+            if (mayBeBumped) {
+                accountsToBump.push(account.toString());
+            }
+        }
+
+        if (accountsToBump.length > 0) {
+            await this.bumpAccounts(accountsToBump, sender);
+        }
+    }
+
+    /**
+     * Bump Fellowship salary cycle
+     *
+     * @param sender - The sender of the transaction.
+     * @returns A promise that resolves when the salary cycle is bumped.
+     */
+    async bumpSalaryCycle(sender): Promise<void> {
+        let currentCycle = await this.api.query['fellowshipSalary'].status();
+        const {cycleIndex, cycleStart} = JSON.parse(currentCycle.toString());
+        const registrationPeriod = Number(await this.api.consts['fellowshipSalary'].registrationPeriod.toString());
+        const payoutPeriod = Number(await this.api.consts['fellowshipSalary'].payoutPeriod.toString());
+
+        const currentBlockNumber = await this.getBlockNumber();
+
+        if (Number(cycleStart) + registrationPeriod + payoutPeriod < currentBlockNumber) {
+            console.log(`Bumping salary cycle ${cycleIndex}`);
+            const transaction = this.api.tx.fellowshipSalary.bump();
+            await sendTransaction(transaction, sender, this.api);
+        }
+    }
+
+    private async getBlockNumber(): Promise<number> {
+        const { block } = await this.api.rpc.chain.getBlock();
+        return block.header.number.toNumber();
+    }
+
+    private async mayBeBumped(rank, memberInfo, currentBlockNumber) {
+        if (!memberInfo.isActive) {
+            return false;
+        }
+
+        const {rankMinPromotionPeriod, rankDemotionPeriod} = await this.getRankPromotionAndDemotionPeriod(rank);
+
+        return rankDemotionPeriod > 0 && currentBlockNumber - memberInfo.lastProof > rankDemotionPeriod;
+
+
+    }
+
+    private async getRankPromotionAndDemotionPeriod(rank: number) {
+        if (!this.params) {
+            await this.loadFellowshipParams();
+        }
+
+        const rankMinPromotionPeriod = this.params['minPromotionPeriod'][rank-1];
+        const rankDemotionPeriod = this.params['demotionPeriod'][rank-1];
+        return {rankMinPromotionPeriod, rankDemotionPeriod};
+    }
+
+    private async loadFellowshipParams() {
+        const params = await this.api.query['fellowshipCore'].params();
+        const paramsJson = params.toJSON();
+        this.params = paramsJson;
+    }
+
+    private async bumpAccounts(accounts: string[], sender) {
+        console.log(`Bumping accounts ${accounts}`);
+        let transaction;
+        if (accounts.length > 1) {
+            transaction = this.api.tx.utility.batchAll(accounts.map(a => this.api.tx.fellowshipCore.bump(a)));
+        } else {
+            transaction = this.api.tx.fellowshipCore.bump(accounts[0]);
+        }
+        await sendTransaction(transaction, sender, this.api);
+    }
+}

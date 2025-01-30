@@ -1,15 +1,14 @@
 import { ApiPromise } from '@polkadot/api';
 import { SubstrateConnection } from '../connection';
-import { Validator } from '../config/conf';
 
 /**
- * Abstract class PayoutHelper that provides a structure for handling payouts.
+ * Abstract class BumpHelper that provides a structure for handling bumps.
  */
-export abstract class PayoutHelper {
+export abstract class BumpHelper {
     protected api: ApiPromise;
 
     /**
-     * Constructor for the PayoutHelper class.
+     * Constructor for the BumpHelper class.
      * @param connection - The connection to the Substrate node.
      */
     constructor(connection: SubstrateConnection) {
@@ -17,13 +16,19 @@ export abstract class PayoutHelper {
     }
 
     /**
-     * Abstract method to payout rewards for the given validators.
-     * @param validators - The validators to payout rewards for.
+     * Abstract method to bump members.
      * @param sender - The sender of the transaction.
-     * @param depth - Whether to check the history for unclaimed rewards.
-     * @returns A promise that resolves when the rewards have been paid out.
+     * @returns A promise that resolves when members are bumped.
      */
-    public abstract payoutRewards(validators: Validator[], sender, depth: boolean): Promise<void>;
+    public abstract bumpMembers(sender): Promise<void>;
+
+    /**
+     * Abstract method to bump salary cycle.
+     * @param sender - The sender of the transaction.
+     * @returns A promise that resolves when salary cycle is bumped.
+     */
+    public abstract bumpSalaryCycle(sender): Promise<void>;
+
 
     /**
      * Method to retry API calls in case of failure.
