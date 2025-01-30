@@ -7,7 +7,7 @@ The application requires a configuration file located at [src/config/conf.ts](sr
 ## Required Environment Variables
 The following environment variable is required for the application to function:
 
-`FELLOWSHIP_ACCOUNT_MNEMONIC` - the mnemonic for the account that will be used to make payouts.
+`BUMP_ACCOUNT_MNEMONIC` - the mnemonic for the account that will be used to make bumps.
 
 ## Running the Application
 The application is designed to be run on a schedule using GitHub Actions.
@@ -19,9 +19,7 @@ yarn install
 
 Run the app:
 ```bash
-yarn start:relaychain
-yarn start:astar
-yarn start:kilt
+yarn start:fellowship
 ```
 
 ## License
