@@ -23,6 +23,7 @@ export type Validator = {
     votersAccounts: string[];
     voteAmount: number;
     voteEnabled: boolean;
+    identity?: string;
 };
 
 /**
@@ -110,37 +111,57 @@ export const config = new Config([
                 address: 'DhK6qU2U5kDWeJKvPRtmnWRs8ETUGZ9S9QmNmQFuzrNoKm4',
                 votersAccounts: ['Day71GSJAxUUiFic8bVaWoAczR3Ue3jNonBZthVHp2BKzyJ'],
                 voteAmount: 110_000_000_000_000,
-                voteEnabled: true
+                voteEnabled: true,
+                identity: '🌌Novasama🌌/Clausius'
             },
             {
                 address: 'EtETk1FbrDg7FoAfkREuXT7xHxCjbEf28sBvWf6zfB5wFyV',
                 votersAccounts: ['Day71GSJAxUUiFic8bVaWoAczR3Ue3jNonBZthVHp2BKzyJ'],
                 voteAmount: 10_000_000_000_000,
-                voteEnabled: true
+                voteEnabled: true,
+                identity: '🌌Novasama🌌/Einstein'
             },
             {
                 address: 'HYqFHkWAXTdYKYRU49VurZ5YnuT58gX7sVdL9weWi7XeczQ',
                 votersAccounts: ['Day71GSJAxUUiFic8bVaWoAczR3Ue3jNonBZthVHp2BKzyJ'],
                 voteAmount: 10_000_000_000_000,
-                voteEnabled: false
+                voteEnabled: false,
+                identity: '🌌Novasama🌌/Hawking'
             },
             {
                 address: 'HuehfUJoctKux1gmMaN2d62SMSZEA3cjKfX2zmJkJEaRxwo',
                 votersAccounts: ['Day71GSJAxUUiFic8bVaWoAczR3Ue3jNonBZthVHp2BKzyJ'],
                 voteAmount: 10_000_000_000_000,
-                voteEnabled: false
+                voteEnabled: false,
+                identity: '🌌Novasama🌌/Kolmogorov'
             },
             {
                 address: 'Gb7iC1jnAJtSaNDoyvmr6aqbcthfhVMocCWiszbQynS6BDi',
                 votersAccounts: ['Day71GSJAxUUiFic8bVaWoAczR3Ue3jNonBZthVHp2BKzyJ'],
                 voteAmount: 10_000_000_000_000,
-                voteEnabled: false
+                voteEnabled: false,
+                identity: '🌌Novasama🌌/Darwin'
             },
             {
                 address: 'D991k2qmiWrVZzkehGP2QYSLdGH3s2gBvHZzpxQrzX4KSvn',
                 votersAccounts: ['Day71GSJAxUUiFic8bVaWoAczR3Ue3jNonBZthVHp2BKzyJ'],
                 voteAmount: 10_000_000_000_000,
-                voteEnabled: false
+                voteEnabled: false,
+                identity: '🌌Novasama🌌/Newton'
+            },
+            {
+                address: 'FcGa3ubu75NT62hDxHEgHyehmgXB26rXHz2ig7HuVe7beVn',
+                votersAccounts: ['Day71GSJAxUUiFic8bVaWoAczR3Ue3jNonBZthVHp2BKzyJ'],
+                voteAmount: 10_000_000_000_000,
+                voteEnabled: false,
+                identity: '🌌Novasama🌌/Knuth'
+            },
+            {
+                address: 'FzzhonMmAyy3GdmgMewwD66mdtc9oAJ4DSrT3bocw3fBgdw',
+                votersAccounts: ['Day71GSJAxUUiFic8bVaWoAczR3Ue3jNonBZthVHp2BKzyJ'],
+                voteAmount: 10_000_000_000_000,
+                voteEnabled: false,
+                identity: '🌌Novasama🌌/Gauss'
             }
         ]
     ),
@@ -152,37 +173,43 @@ export const config = new Config([
                 address: '127zarPDhVzmCXVQ7Kfr1yyaa9wsMuJ74GJW9Q7ezHfQEgh6',
                 votersAccounts: ['15cfSaBcTxNr8rV59cbhdMNCRagFr3GE6B3zZRsCp4QHHKPu'],
                 voteAmount: 50_000_000_000_000,
-                voteEnabled: true
+                voteEnabled: true,
+                identity: '🌌Novasama🌌/Nash'
             },
             {
                 address: '13JuwkvSqGUDo8zErgfC9ivGfKfcdDyceFkvh9NW4wz7NbuF',
                 votersAccounts: ['15cfSaBcTxNr8rV59cbhdMNCRagFr3GE6B3zZRsCp4QHHKPu'],
                 voteAmount: 1,
-                voteEnabled: false
+                voteEnabled: false,
+                identity: '🌌Novasama🌌/Shannon'
             },
             {
                 address: '15yWjJfhPwiBECjVezPTA42EFpcrxmRUjzPN6nf3azvZ5wDX',
                 votersAccounts: ['15cfSaBcTxNr8rV59cbhdMNCRagFr3GE6B3zZRsCp4QHHKPu'],
                 voteAmount: 1,
-                voteEnabled: false
+                voteEnabled: false,
+                identity: '🌌Novasama🌌/Dijkstra'
             },
             {
                 address: '151oCCvw1aZS8TZHzvAj6J3zJec7ZLEKRj6FVWhzVGbTXTG1',
                 votersAccounts: ['15cfSaBcTxNr8rV59cbhdMNCRagFr3GE6B3zZRsCp4QHHKPu'],
                 voteAmount: 1,
-                voteEnabled: false
+                voteEnabled: false,
+                identity: '🌌Novasama🌌/Turing'
             },
             {
                 address: '15cfSaBcTxNr8rV59cbhdMNCRagFr3GE6B3zZRsCp4QHHKPu',
                 votersAccounts: ['15cfSaBcTxNr8rV59cbhdMNCRagFr3GE6B3zZRsCp4QHHKPu'],
                 voteAmount: 1,
-                voteEnabled: false
+                voteEnabled: false,
+                identity: '🌌Novasama🌌/✨👍✨ Day7 ✨👍✨'
             },
             {
                 address: '16LLBgPW338sbqCkxHpKGpZB9P9y7nnaMSZFodUhpb3bs1H3',
                 votersAccounts: ['15cfSaBcTxNr8rV59cbhdMNCRagFr3GE6B3zZRsCp4QHHKPu'],
                 voteAmount: 1,
-                voteEnabled: false
+                voteEnabled: false,
+                identity: '🌌Novasama🌌/von Neumann'
             }
         ]
     ),
