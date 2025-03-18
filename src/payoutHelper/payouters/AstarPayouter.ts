@@ -9,7 +9,7 @@ export class AstarPayoutHelper extends PayoutHelper {
 
     /**
      * Converts an era number to a u32 type.
-     * @param era - The era number.
+     * @param era - The era number, represented as a string.
      * @returns The era number as a u32 type.
      */
     private eraIndex(era: string) {
