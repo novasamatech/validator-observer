@@ -6,16 +6,6 @@ import { PayoutHelper } from "../PayoutHelper";
  * AstarPayoutHelper is a class that extends PayoutHelper and provides methods to handle payouts on the Astar network.
  */
 export class AstarPayoutHelper extends PayoutHelper {
-
-    /**
-     * Converts an era number to a u32 type.
-     * @param era - The era number.
-     * @returns The era number as a u32 type.
-     */
-    private eraIndex(era: number) {
-        return this.api.createType('u32', era);
-    }
-
     /**
      * Creates an AstarPrimitivesDappStakingSmartContract type with the given validator address.
      * @param dappAddress - The dapp address.
@@ -68,8 +58,8 @@ export class AstarPayoutHelper extends PayoutHelper {
      * @param dappAddress - The dapp address.
      * @returns A promise that resolves with an array of eras to reward.
      */
-    private async getErasToReward(dappAddress: string): Promise<Array<string>> {
-        const rewardEras: Array<string> = [];
+    private async getErasToReward(dappAddress: string): Promise<Array<number>> {
+        const rewardEras: Array<number> = [];
         const dappInfo = await this.api.query.dappStaking.integratedDApps({ Evm: dappAddress });
         const ourDappId = (dappInfo as any).unwrap().id.toNumber();
 
@@ -89,8 +79,8 @@ export class AstarPayoutHelper extends PayoutHelper {
 
             const ourUnclaimedTier = dapps.find(({ dappId }) => dappId === ourDappId);
             if (ourUnclaimedTier) {
-                const eraHumanReadable = era.toHuman() as string;
-                rewardEras.push(eraHumanReadable[0]);
+                const eraNumber = (era.args[0] as any).toNumber();
+                rewardEras.push(eraNumber);
             }
         });
 
@@ -105,7 +95,7 @@ export class AstarPayoutHelper extends PayoutHelper {
      * @param batch_size - The size of the batch of transactions to send.
      * @returns A promise that resolves when the payout has been processed.
      */
-    private async processPayout(dappAddress: string, rewardEras: Array<string>, sender: any, batch_size: number = 20) {
+    private async processPayout(dappAddress: string, rewardEras: Array<number>, sender: any, batch_size: number = 20) {
         const transactions: any = [];
         rewardEras = rewardEras.reverse();
 
@@ -113,7 +103,7 @@ export class AstarPayoutHelper extends PayoutHelper {
             const batch = rewardEras.slice(i, i + batch_size).map(era =>
                 this.api.tx.dappStaking.claimDappReward(
                     this.astarRuntimeSmartContract(dappAddress),
-                    this.eraIndex(Number(era))
+                    this.api.createType('u32', era),
                 )
             )
             transactions.push(this.api.tx.utility.batch(batch));
