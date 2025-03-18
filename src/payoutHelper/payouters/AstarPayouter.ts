@@ -12,8 +12,9 @@ export class AstarPayoutHelper extends PayoutHelper {
      * @param era - The era number.
      * @returns The era number as a u32 type.
      */
-    private eraIndex(era: number) {
-        return this.api.createType('u32', era);
+    private eraIndex(era: string) {
+        const eraNumber = era.replace(',', ''); // Remove commas from the era string
+        return this.api.createType('u32', eraNumber);
     }
 
     /**
@@ -113,7 +114,7 @@ export class AstarPayoutHelper extends PayoutHelper {
             const batch = rewardEras.slice(i, i + batch_size).map(era =>
                 this.api.tx.dappStaking.claimDappReward(
                     this.astarRuntimeSmartContract(dappAddress),
-                    this.eraIndex(Number(era))
+                    this.eraIndex(era)
                 )
             )
             transactions.push(this.api.tx.utility.batch(batch));
