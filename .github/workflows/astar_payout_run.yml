@@ -8,6 +8,8 @@ on:
 
 env:
   PAYOUTS_ACCOUNT_MNEMONIC: ${{ secrets.PAYOUTS_ACCOUNT_MNEMONIC }}
+  # How many times to retry before giving up
+  RETRIES: 5
 
 jobs:
   build:
@@ -20,8 +22,36 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Run app
-        run: yarn start:astar
+      - name: Run astar with retries
+        env:
+          RETRIES: ${{ env.RETRIES }}
+        run: |
+          set -o pipefail
+
+          retries=${RETRIES:-3}
+          echo "▶️ Will attempt relaychain payout up to $retries times"
+
+          for attempt in $(seq 1 $retries); do
+            echo
+            echo "===== Attempt $attempt of $retries ====="
+            if yarn start:astar; then
+              echo "✅ Success on attempt $attempt!"
+              exit 0
+            else
+              status=$?
+              echo "❌ Failed on attempt $attempt (exit code $status)."
+              echo "----- End of attempt $attempt logs -----"
+            fi
+
+            if [ "$attempt" -lt "$retries" ]; then
+              echo "⏳ Waiting 10s before retry…"
+              sleep 10
+            fi
+          done
+
+          echo
+          echo "🚨 All $retries attempts failed. Exiting with code $status."
+          exit $status
 
   telegram-notification:
     needs: [build]
@@ -35,6 +65,6 @@ jobs:
           token: ${{ secrets.TELEGRAM_TOKEN }}
           format: markdown
           message: |
-            💸 Astar payout failed, see logs for details:
+            💸 Astar payout failed after ${{ env.RETRIES }} attempts, see logs for details:
 
             Github run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
