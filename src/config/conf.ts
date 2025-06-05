@@ -111,14 +111,14 @@ export const config = new Config([
                 address: 'DhK6qU2U5kDWeJKvPRtmnWRs8ETUGZ9S9QmNmQFuzrNoKm4',
                 votersAccounts: ['Day71GSJAxUUiFic8bVaWoAczR3Ue3jNonBZthVHp2BKzyJ'],
                 voteAmount: 110_000_000_000_000,
-                voteEnabled: true,
+                voteEnabled: false,
                 identity: '🌌Novasama🌌/Clausius'
             },
             {
                 address: 'EtETk1FbrDg7FoAfkREuXT7xHxCjbEf28sBvWf6zfB5wFyV',
                 votersAccounts: ['Day71GSJAxUUiFic8bVaWoAczR3Ue3jNonBZthVHp2BKzyJ'],
                 voteAmount: 10_000_000_000_000,
-                voteEnabled: true,
+                voteEnabled: false,
                 identity: '🌌Novasama🌌/Einstein'
             },
             {
@@ -173,7 +173,7 @@ export const config = new Config([
                 address: '127zarPDhVzmCXVQ7Kfr1yyaa9wsMuJ74GJW9Q7ezHfQEgh6',
                 votersAccounts: ['15cfSaBcTxNr8rV59cbhdMNCRagFr3GE6B3zZRsCp4QHHKPu'],
                 voteAmount: 50_000_000_000_000,
-                voteEnabled: true,
+                voteEnabled: false,
                 identity: '🌌Novasama🌌/Nash'
             },
             {
@@ -227,7 +227,7 @@ export const config = new Config([
     ),
     new KiltConfig(
         'Kilt',
-        'wss://kilt-rpc.dwellir.com',
+        'wss://spiritnet.kilt.io',
         [
             {
                 address: '4sPMk6DgLbaYHaDKWpwFJQVBv3GupqHJRFWngHeALUrv37x9',
