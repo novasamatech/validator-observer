@@ -153,14 +153,14 @@ export const config = new Config([
                 address: 'FcGa3ubu75NT62hDxHEgHyehmgXB26rXHz2ig7HuVe7beVn',
                 votersAccounts: ['Day71GSJAxUUiFic8bVaWoAczR3Ue3jNonBZthVHp2BKzyJ'],
                 voteAmount: 10_000_000_000_000,
-                voteEnabled: true,
+                voteEnabled: false,
                 identity: '🌌Novasama🌌/Knuth'
             },
             {
                 address: 'FzzhonMmAyy3GdmgMewwD66mdtc9oAJ4DSrT3bocw3fBgdw',
                 votersAccounts: ['Day71GSJAxUUiFic8bVaWoAczR3Ue3jNonBZthVHp2BKzyJ'],
                 voteAmount: 10_000_000_000_000,
-                voteEnabled: true,
+                voteEnabled: false,
                 identity: '🌌Novasama🌌/Gauss'
             }
         ]
@@ -194,7 +194,7 @@ export const config = new Config([
                 address: '151oCCvw1aZS8TZHzvAj6J3zJec7ZLEKRj6FVWhzVGbTXTG1',
                 votersAccounts: ['15cfSaBcTxNr8rV59cbhdMNCRagFr3GE6B3zZRsCp4QHHKPu'],
                 voteAmount: 1,
-                voteEnabled: true,
+                voteEnabled: false,
                 identity: '🌌Novasama🌌/Turing'
             },
             {
@@ -208,7 +208,7 @@ export const config = new Config([
                 address: '16LLBgPW338sbqCkxHpKGpZB9P9y7nnaMSZFodUhpb3bs1H3',
                 votersAccounts: ['15cfSaBcTxNr8rV59cbhdMNCRagFr3GE6B3zZRsCp4QHHKPu'],
                 voteAmount: 1,
-                voteEnabled: true,
+                voteEnabled: false,
                 identity: '🌌Novasama🌌/von Neumann'
             }
         ]
