@@ -227,7 +227,7 @@ export const config = new Config([
     ),
     new KiltConfig(
         'Kilt',
-        'wss://kilt-rpc.dwellir.com',
+        'wss://spiritnet.kilt.io',
         [
             {
                 address: '4sPMk6DgLbaYHaDKWpwFJQVBv3GupqHJRFWngHeALUrv37x9',
