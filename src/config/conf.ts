@@ -104,8 +104,8 @@ export class Config {
  */
 export const config = new Config([
     new RelaychainConfig(
-        'Kusama',
-        'wss://rpc-kusama-1.novasama-tech.org',
+        'Kusama Asset Hub',
+        'wss://sys.ibp.network/statemine',
         [
             {
                 address: 'DhK6qU2U5kDWeJKvPRtmnWRs8ETUGZ9S9QmNmQFuzrNoKm4',
