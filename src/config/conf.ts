@@ -105,7 +105,7 @@ export class Config {
 export const config = new Config([
     new RelaychainConfig(
         'Kusama Asset Hub',
-        'wss://sys.ibp.network/statemine',
+        'wss://asset-hub-kusama-rpc.n.dwellir.com',
         [
             {
                 address: 'DhK6qU2U5kDWeJKvPRtmnWRs8ETUGZ9S9QmNmQFuzrNoKm4',
@@ -166,8 +166,8 @@ export const config = new Config([
         ]
     ),
     new RelaychainConfig(
-        'Polkadot',
-        'wss://rpc-polkadot-1.novasama-tech.org',
+        'Polkadot Asset Hub',
+        'wss://rpc-assethub.novasama-tech.org',
         [
             {
                 address: '127zarPDhVzmCXVQ7Kfr1yyaa9wsMuJ74GJW9Q7ezHfQEgh6',
