@@ -5,15 +5,26 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 */2 * * *"
+  push:
+    branches:
+      - fix/tx-status
 
 env:
   PAYOUTS_ACCOUNT_MNEMONIC: ${{ secrets.PAYOUTS_ACCOUNT_MNEMONIC }}
   # How many times to retry before giving up
   RETRIES: 5
+  PAYOUT_DEBUG: "1" 
+  PAYOUT_DEBUG_SAMPLE_ERA: "8937"
+  PAYOUT_DEBUG_SAMPLE_VALIDATOR: "DhK6qU2U5kDWeJKvPRtmnWRs8ETUGZ9S9QmNmQFuzrNoKm4"
+  PAYOUT_FORCE_VALIDATOR: "DhK6qU2U5kDWeJKvPRtmnWRs8ETUGZ9S9QmNmQFuzrNoKm4"
+  PAYOUT_FORCE_ERA: "8937"
+  PAYOUT_FORCE_PAGE: "0"
+  
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout code
@@ -56,6 +67,7 @@ jobs:
   telegram-notification:
     needs: [build]
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     if: failure()
     steps:
       - name: Notify Telegram channel

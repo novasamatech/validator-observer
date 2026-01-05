@@ -1,7 +1,7 @@
-import { SubmittableExtrinsic } from '@polkadot/api/types';
-import { Validator } from '../../config/conf';
-import { sendTransaction } from '../../utils';
-import { PayoutHelper } from '../PayoutHelper';
+import { SubmittableExtrinsic } from "@polkadot/api/types";
+import { Validator } from "../../config/conf";
+import { sendTransaction } from "../../utils";
+import { PayoutHelper } from "../PayoutHelper";
 
 /***
  * New logic to handle payouts if erasStakersOverview exists.
@@ -13,43 +13,87 @@ export class NewRelaychainPayoutLogic extends PayoutHelper {
    * @param sender - The sender of the transaction.
    * @param depth - Whether to check the history for unclaimed rewards.
    */
-  async payoutRewards(validators: Validator[], sender, depth: boolean = false): Promise<void> {
-    const currentEra = await this.getCurrentEraNumber();
-    const eraToReward = currentEra - 1;
+  async payoutRewards(
+    validators: Validator[],
+    sender,
+    depth: boolean = false,
+  ): Promise<void> {
+    const activeEra = await this.getActiveEraNumber();
+    const lastClaimableEra = Math.max(activeEra - 1, 0);
     const historyDepth = this.getHistoryDepth();
-    const startEra = Math.max(eraToReward - historyDepth, 0);
+    const startEra = Math.max(lastClaimableEra - historyDepth, 0);
     const transactions: Array<SubmittableExtrinsic<any, any>> = [];
 
-    await this.collectTransactionsForUnclaimedRewards(startEra, currentEra, validators, transactions);
+    const payoutPlan = await this.collectTransactionsForUnclaimedRewards(
+      startEra,
+      lastClaimableEra,
+      validators,
+      transactions,
+    );
+    this.logPayoutPlan(payoutPlan);
     await this.executeTransactionsInBatches(transactions, sender, 2);
   }
 
   /**
    * Collects transactions for unclaimed rewards for validators within a specified era range.
    * @param startEra The starting era from which to collect unclaimed rewards.
-   * @param currentEra The current era up to which to check for unclaimed rewards.
+   * @param lastClaimableEra The last era eligible for payout.
    * @param validators An array of validators for whom to check unclaimed rewards.
    * @param transactions An array to which the payout transactions will be added.
    */
   private async collectTransactionsForUnclaimedRewards(
     startEra: number,
-    currentEra: number,
+    lastClaimableEra: number,
     validators: Validator[],
     transactions: Array<SubmittableExtrinsic<any, any>>,
-  ): Promise<void> {
-    for (let era = startEra; era < currentEra; era++) {
+  ): Promise<Map<string, Set<number>>> {
+    const payoutPlan = new Map<string, Set<number>>();
+
+    for (const validator of validators) {
+      payoutPlan.set(validator.address, new Set());
+    }
+
+    for (let era = startEra; era <= lastClaimableEra; era++) {
       for (const validator of validators) {
         const eraStakersOverview =
-          (await this.api.query.staking.erasStakersOverview(era, validator.address)).toJSON() || {};
+          (
+            await this.api.query.staking.erasStakersOverview(
+              era,
+              validator.address,
+            )
+          ).toJSON() || {};
         if (Object.keys(eraStakersOverview).length === 0) continue;
 
-        const claimedPages = (await this.api.query.staking.claimedRewards(era, validator.address)).toJSON();
+        const claimedPages = (
+          await this.api.query.staking.claimedRewards(era, validator.address)
+        ).toJSON();
         // @ts-ignore
         if (!claimedPages || claimedPages.length === 0) {
-          const transaction = this.api.tx.staking.payoutStakers(validator.address, era);
+          payoutPlan.get(validator.address)!.add(era);
+          const transaction = this.api.tx.staking.payoutStakers(
+            validator.address,
+            era,
+          );
           transactions.push(transaction);
         }
       }
+    }
+
+    return payoutPlan;
+  }
+
+  private logPayoutPlan(payoutPlan: Map<string, Set<number>>): void {
+    for (const [validator, eras] of payoutPlan) {
+      const eraList = Array.from(eras);
+      if (eraList.length === 0) {
+        console.log(
+          `Payout plan for validator ${validator}: no unclaimed eras`,
+        );
+        continue;
+      }
+      console.log(
+        `Payout plan for validator ${validator}: eras ${eraList.join(", ")}`,
+      );
     }
   }
 
@@ -66,7 +110,8 @@ export class NewRelaychainPayoutLogic extends PayoutHelper {
   ): Promise<void> {
     for (let i = 0; i < transactions.length; i += size) {
       const batchTransactions = transactions.slice(i, i + size);
-      const batchTransaction = this.api.tx.utility.forceBatch(batchTransactions);
+      const batchTransaction =
+        this.api.tx.utility.forceBatch(batchTransactions);
       await sendTransaction(batchTransaction, sender, this.api);
     }
   }
@@ -75,10 +120,37 @@ export class NewRelaychainPayoutLogic extends PayoutHelper {
    * Retrieves the current era number from the blockchain.
    * @returns {Promise<number>} The current era as a number.
    */
-  private async getCurrentEraNumber(): Promise<number> {
+  private async getActiveEraNumber(): Promise<number> {
+    const activeEra = await this.api.query.staking.activeEra();
+    const activeEraJson = activeEra.toJSON() as
+      | number
+      | string
+      | { index?: number | string }
+      | null;
+    if (
+      activeEraJson &&
+      typeof activeEraJson === "object" &&
+      "index" in activeEraJson
+    ) {
+      return Number(activeEraJson.index ?? 0);
+    }
+    if (activeEraJson !== null && activeEraJson !== undefined) {
+      return Number(activeEraJson ?? 0);
+    }
     const currentEra = await this.api.query.staking.currentEra();
-    // @ts-ignore
-    return currentEra.unwrap().toNumber();
+    const currentEraJson = currentEra.toJSON() as
+      | number
+      | string
+      | { index?: number | string }
+      | null;
+    if (
+      currentEraJson &&
+      typeof currentEraJson === "object" &&
+      "index" in currentEraJson
+    ) {
+      return Number(currentEraJson.index ?? 0);
+    }
+    return Number(currentEraJson ?? 0);
   }
 
   /**
