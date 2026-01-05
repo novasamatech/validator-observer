@@ -22,7 +22,7 @@ export class RelychainPayoutHelper extends PayoutHelper {
    * @returns A promise that resolves when the rewards have been paid out.
    */
   async payoutRewards(validators: Validator[], sender, depth: boolean = false): Promise<void> {
-    if (this.api.query.staking.erasStakersOverview) {
+    if ('erasStakersOverview' in this.api.query.staking) {
       await this.newPayoutLogic.payoutRewards(validators, sender, depth);
     } else {
       for (const validator of validators) {
@@ -54,9 +54,9 @@ export class RelychainPayoutHelper extends PayoutHelper {
    */
   private async checkPayouts(validatorAddress: string, depth): Promise<number[]> {
     // @ts-ignore
-    const currentEra = (await this.api.query.staking.activeEra()).unwrapOr(null);
+    const currentEra = (await this.api.query.staking.activeEra()).unwrapOr(null)?.index.toNumber() ?? 0;
     const lastReward = await this.getLastReward(validatorAddress, depth);
-    const numOfPotentialUnclaimedPayouts = currentEra.index - lastReward - 1;
+    const numOfPotentialUnclaimedPayouts = currentEra - lastReward - 1;
     const unclaimedPayouts: number[] = [];
 
     for (let i = 1; i <= numOfPotentialUnclaimedPayouts; i++) {
@@ -78,7 +78,7 @@ export class RelychainPayoutHelper extends PayoutHelper {
   private async getLastReward(validatorAddress: string, isHistoryCheckForced = false): Promise<number> {
     const ledger = (await this.api.derive.staking.account(validatorAddress)).stakingLedger;
     let lastReward: number;
-    const rewards = ledger.claimedRewards || ledger.legacyClaimedRewards; // Workaround for the Kusama upgrade
+    const rewards = ledger['claimedRewards'] || ledger.legacyClaimedRewards; // Workaround for the Kusama upgrade
     // TODO: Remove the workaround and check the logic for reward payout
 
     if (isHistoryCheckForced || rewards.length == 0) {

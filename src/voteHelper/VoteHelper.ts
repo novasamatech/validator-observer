@@ -111,7 +111,7 @@ export class VoteHelper {
 
   async voteForReferenda(vote: Vote, sender, validator: string, balance: number): Promise<void> {
     const constructedVote = vote.createPayload(this.api, balance);
-    const voteTransaction = this.api.tx.convictionVoting.vote(vote.referendaNumber, constructedVote);
+    const voteTransaction = this.api.tx.convictionVoting.vote(vote.referendaNumber, constructedVote as never);
     const proxyTransaction = this.api.tx.proxy.proxy(validator, 'Governance', voteTransaction);
     await sendTransaction(proxyTransaction, sender, this.api);
   }

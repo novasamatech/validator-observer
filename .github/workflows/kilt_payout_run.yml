@@ -1,10 +1,7 @@
 name: Make kilt payouts
 
 on:
-  pull_request:
   workflow_dispatch:
-  schedule:
-    - cron: "0 0 * * MON"
 
 env:
   PAYOUTS_ACCOUNT_MNEMONIC: ${{ secrets.PAYOUTS_ACCOUNT_MNEMONIC }}
@@ -14,6 +11,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout code
@@ -52,10 +50,11 @@ jobs:
           echo
           echo "🚨 All $retries attempts failed. Exiting with code $status."
           exit $status
-    
+
   telegram-notification:
     needs: [build]
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     if: failure()
     steps:
       - name: Notify Telegram channel
@@ -68,4 +67,3 @@ jobs:
             💸 Kilt payout failed after ${{ env.RETRIES }} attempts, see logs for details:
 
             Github run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      
