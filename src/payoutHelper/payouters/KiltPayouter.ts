@@ -34,7 +34,11 @@ export class KiltPayoutHelper extends PayoutHelper {
    */
   private async incrementDelegatorRewards(validator: string, sender: any): Promise<void> {
     const incrementDelegatorRewards = this.api.tx.parachainStaking.incrementDelegatorRewards();
-    const proxyIncrementTransact = this.api.tx.proxy.proxy(validator, 'ParachainStaking', incrementDelegatorRewards);
+    const proxyIncrementTransact = this.api.tx.proxy.proxy(
+      validator,
+      'ParachainStaking' as 'Any',
+      incrementDelegatorRewards,
+    );
     await sendTransaction(proxyIncrementTransact, sender, this.api);
   }
 
@@ -82,7 +86,7 @@ export class KiltPayoutHelper extends PayoutHelper {
    */
   private async claimRewards(validator: string, sender: any): Promise<void> {
     const claimReward = this.api.tx.parachainStaking.claimRewards();
-    const proxyclaimTransact = this.api.tx.proxy.proxy(validator, 'ParachainStaking', claimReward);
+    const proxyclaimTransact = this.api.tx.proxy.proxy(validator, 'ParachainStaking' as 'Any', claimReward);
     await sendTransaction(proxyclaimTransact, sender, this.api);
   }
 }

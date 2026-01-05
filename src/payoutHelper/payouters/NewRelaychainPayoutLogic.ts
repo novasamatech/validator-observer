@@ -103,19 +103,18 @@ export class NewRelaychainPayoutLogic extends PayoutHelper {
    */
   private async getActiveEraNumber(): Promise<number> {
     const activeEra = await this.api.query.staking.activeEra();
-    const activeEraJson = activeEra.toJSON() as number | string | { index?: number | string } | null;
-    if (activeEraJson && typeof activeEraJson === 'object' && 'index' in activeEraJson) {
-      return Number(activeEraJson.index ?? 0);
+    if (activeEra.isSome) {
+      const value = activeEra.unwrapOrDefault();
+      return value.index.toNumber() ?? 0;
     }
-    if (activeEraJson !== null && activeEraJson !== undefined) {
-      return Number(activeEraJson ?? 0);
-    }
+
     const currentEra = await this.api.query.staking.currentEra();
-    const currentEraJson = currentEra.toJSON() as number | string | { index?: number | string } | null;
-    if (currentEraJson && typeof currentEraJson === 'object' && 'index' in currentEraJson) {
-      return Number(currentEraJson.index ?? 0);
+    if (currentEra.isSome) {
+      const value = currentEra.unwrapOrDefault();
+      return value.toNumber() ?? 0;
     }
-    return Number(currentEraJson ?? 0);
+
+    return 0;
   }
 
   /**
@@ -123,6 +122,6 @@ export class NewRelaychainPayoutLogic extends PayoutHelper {
    * @returns {number} The history depth as a number.
    */
   private getHistoryDepth(): number {
-    return Number(this.api.consts.staking.historyDepth.toString());
+    return this.api.consts.staking.historyDepth.toNumber();
   }
 }

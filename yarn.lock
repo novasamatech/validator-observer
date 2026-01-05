@@ -106,7 +106,7 @@
   resolved "https://registry.yarnpkg.com/@polkadot-api/utils/-/utils-0.1.0.tgz#d36937cdc465c2ea302f3278cf53157340ab33a0"
   integrity sha512-MXzWZeuGxKizPx2Xf/47wx9sr/uxKw39bVJUptTJdsaQn/TGq+z310mHzf1RCGvC1diHM8f593KrnDgc9oNbJA==
 
-"@polkadot/api-augment@16.5.4":
+"@polkadot/api-augment@16.5.4", "@polkadot/api-augment@^16.5.4":
   version "16.5.4"
   resolved "https://registry.yarnpkg.com/@polkadot/api-augment/-/api-augment-16.5.4.tgz#40084178849c50681b78da1650c55ee2335f2bdf"
   integrity sha512-9FTohz13ih458V2JBFjRACKHPqfM6j4bmmTbcSaE7hXcIOYzm4ABFo7xq5osLyvItganjsICErL2vRn2zULycw==
