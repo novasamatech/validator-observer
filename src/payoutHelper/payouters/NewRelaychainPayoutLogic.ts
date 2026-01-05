@@ -1,7 +1,7 @@
-import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { Validator } from "../../config/conf";
-import { sendTransaction } from "../../utils";
-import { PayoutHelper } from "../PayoutHelper";
+import { SubmittableExtrinsic } from '@polkadot/api/types';
+import { Validator } from '../../config/conf';
+import { sendTransaction } from '../../utils';
+import { PayoutHelper } from '../PayoutHelper';
 
 /***
  * New logic to handle payouts if erasStakersOverview exists.
@@ -13,11 +13,7 @@ export class NewRelaychainPayoutLogic extends PayoutHelper {
    * @param sender - The sender of the transaction.
    * @param depth - Whether to check the history for unclaimed rewards.
    */
-  async payoutRewards(
-    validators: Validator[],
-    sender,
-    depth: boolean = false,
-  ): Promise<void> {
+  async payoutRewards(validators: Validator[], sender, depth: boolean = false): Promise<void> {
     const activeEra = await this.getActiveEraNumber();
     const lastClaimableEra = Math.max(activeEra - 1, 0);
     const historyDepth = this.getHistoryDepth();
@@ -56,24 +52,14 @@ export class NewRelaychainPayoutLogic extends PayoutHelper {
     for (let era = startEra; era <= lastClaimableEra; era++) {
       for (const validator of validators) {
         const eraStakersOverview =
-          (
-            await this.api.query.staking.erasStakersOverview(
-              era,
-              validator.address,
-            )
-          ).toJSON() || {};
+          (await this.api.query.staking.erasStakersOverview(era, validator.address)).toJSON() || {};
         if (Object.keys(eraStakersOverview).length === 0) continue;
 
-        const claimedPages = (
-          await this.api.query.staking.claimedRewards(era, validator.address)
-        ).toJSON();
+        const claimedPages = (await this.api.query.staking.claimedRewards(era, validator.address)).toJSON();
         // @ts-ignore
         if (!claimedPages || claimedPages.length === 0) {
           payoutPlan.get(validator.address)!.add(era);
-          const transaction = this.api.tx.staking.payoutStakers(
-            validator.address,
-            era,
-          );
+          const transaction = this.api.tx.staking.payoutStakers(validator.address, era);
           transactions.push(transaction);
         }
       }
@@ -86,14 +72,10 @@ export class NewRelaychainPayoutLogic extends PayoutHelper {
     for (const [validator, eras] of payoutPlan) {
       const eraList = Array.from(eras);
       if (eraList.length === 0) {
-        console.log(
-          `Payout plan for validator ${validator}: no unclaimed eras`,
-        );
+        console.log(`Payout plan for validator ${validator}: no unclaimed eras`);
         continue;
       }
-      console.log(
-        `Payout plan for validator ${validator}: eras ${eraList.join(", ")}`,
-      );
+      console.log(`Payout plan for validator ${validator}: eras ${eraList.join(', ')}`);
     }
   }
 
@@ -110,8 +92,7 @@ export class NewRelaychainPayoutLogic extends PayoutHelper {
   ): Promise<void> {
     for (let i = 0; i < transactions.length; i += size) {
       const batchTransactions = transactions.slice(i, i + size);
-      const batchTransaction =
-        this.api.tx.utility.forceBatch(batchTransactions);
+      const batchTransaction = this.api.tx.utility.forceBatch(batchTransactions);
       await sendTransaction(batchTransaction, sender, this.api);
     }
   }
@@ -122,32 +103,16 @@ export class NewRelaychainPayoutLogic extends PayoutHelper {
    */
   private async getActiveEraNumber(): Promise<number> {
     const activeEra = await this.api.query.staking.activeEra();
-    const activeEraJson = activeEra.toJSON() as
-      | number
-      | string
-      | { index?: number | string }
-      | null;
-    if (
-      activeEraJson &&
-      typeof activeEraJson === "object" &&
-      "index" in activeEraJson
-    ) {
+    const activeEraJson = activeEra.toJSON() as number | string | { index?: number | string } | null;
+    if (activeEraJson && typeof activeEraJson === 'object' && 'index' in activeEraJson) {
       return Number(activeEraJson.index ?? 0);
     }
     if (activeEraJson !== null && activeEraJson !== undefined) {
       return Number(activeEraJson ?? 0);
     }
     const currentEra = await this.api.query.staking.currentEra();
-    const currentEraJson = currentEra.toJSON() as
-      | number
-      | string
-      | { index?: number | string }
-      | null;
-    if (
-      currentEraJson &&
-      typeof currentEraJson === "object" &&
-      "index" in currentEraJson
-    ) {
+    const currentEraJson = currentEra.toJSON() as number | string | { index?: number | string } | null;
+    if (currentEraJson && typeof currentEraJson === 'object' && 'index' in currentEraJson) {
       return Number(currentEraJson.index ?? 0);
     }
     return Number(currentEraJson ?? 0);

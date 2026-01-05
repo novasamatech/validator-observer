@@ -1,8 +1,4 @@
-export async function sendTransaction(
-  transaction: any,
-  sender: any,
-  api: any,
-): Promise<void> {
+export async function sendTransaction(transaction: any, sender: any, api: any): Promise<void> {
   await new Promise<void>((resolve, reject) => {
     let unsubscribe: (() => void) | null = null;
     let finished = false;
@@ -14,10 +10,7 @@ export async function sendTransaction(
         try {
           unsubscribe();
         } catch (unsubError) {
-          console.warn(
-            "Failed to unsubscribe from transaction updates",
-            unsubError,
-          );
+          console.warn('Failed to unsubscribe from transaction updates', unsubError);
         }
       }
       if (error) {
@@ -31,13 +24,13 @@ export async function sendTransaction(
       if (dispatchError?.isModule && api?.registry) {
         const decoded = api.registry.findMetaError(dispatchError.asModule);
         const { docs, method, section } = decoded;
-        return `${section}.${method}: ${docs.join(" ")}`;
+        return `${section}.${method}: ${docs.join(' ')}`;
       }
-      return dispatchError?.toString?.() ?? "Unknown dispatch error";
+      return dispatchError?.toString?.() ?? 'Unknown dispatch error';
     };
 
     const formatResultDetails = (result: any): string => {
-      if (!result) return "";
+      if (!result) return '';
       const parts: string[] = [];
       const dispatchError = result.dispatchError;
       const internalError = result.internalError;
@@ -48,7 +41,7 @@ export async function sendTransaction(
 
       if (internalError) {
         const message =
-          typeof internalError === "string"
+          typeof internalError === 'string'
             ? internalError
             : internalError?.message
               ? internalError.message.toString()
@@ -60,7 +53,7 @@ export async function sendTransaction(
         parts.push(`txHash=${result.txHash.toString()}`);
       }
 
-      return parts.join("; ");
+      return parts.join('; ');
     };
 
     const logError = (message: string, result?: any) => {
@@ -78,9 +71,7 @@ export async function sendTransaction(
 
         if (status.isInBlock) {
           console.log(`Transaction included at blockHash ${status.asInBlock}`);
-          const failedEvent = events?.find(({ event }) =>
-            api.events.system.ExtrinsicFailed.is(event),
-          );
+          const failedEvent = events?.find(({ event }) => api.events.system.ExtrinsicFailed.is(event));
 
           if (failedEvent) {
             const {
@@ -88,9 +79,7 @@ export async function sendTransaction(
                 data: [error],
               },
             } = failedEvent;
-            const message = error.isModule
-              ? formatDispatchError(error)
-              : error.toString();
+            const message = error.isModule ? formatDispatchError(error) : error.toString();
             logError(message, result);
             finalize(new Error(message));
             return;
@@ -102,45 +91,31 @@ export async function sendTransaction(
             events?.find(
               ({ event }) =>
                 (utility.ItemFailed && utility.ItemFailed.is(event)) ||
-                (utility.BatchInterrupted &&
-                  utility.BatchInterrupted.is(event)) ||
-                (utility.BatchCompletedWithErrors &&
-                  utility.BatchCompletedWithErrors.is(event)),
+                (utility.BatchInterrupted && utility.BatchInterrupted.is(event)) ||
+                (utility.BatchCompletedWithErrors && utility.BatchCompletedWithErrors.is(event)),
             );
           if (utilityError) {
-            logError(
-              `Utility ${utilityError.event.section}.${utilityError.event.method}`,
-              result,
-            );
-            finalize(new Error("Utility batch error"));
+            logError(`Utility ${utilityError.event.section}.${utilityError.event.method}`, result);
+            finalize(new Error('Utility batch error'));
           }
         } else if (status.isFinalized) {
-          console.log(
-            `Transaction finalized at blockHash ${status.asFinalized}`,
-          );
+          console.log(`Transaction finalized at blockHash ${status.asFinalized}`);
           finalize();
-        } else if (
-          status.isInvalid ||
-          status.isDropped ||
-          status.isUsurped ||
-          status.isRetracted
-        ) {
+        } else if (status.isInvalid || status.isDropped || status.isUsurped || status.isRetracted) {
           const message = `Transaction ${status.type || status.toString()}`;
           logError(message, result);
           finalize(new Error(message));
         } else {
-          console.log(
-            `Waiting for status update... Current status is: ${status}`,
-          );
+          console.log(`Waiting for status update... Current status is: ${status}`);
         }
       })
-      .then((unsub) => {
+      .then(unsub => {
         unsubscribe = unsub;
         if (finished) {
           unsub();
         }
       })
-      .catch((error) => {
+      .catch(error => {
         finalize(error);
       });
   });
