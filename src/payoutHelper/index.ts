@@ -1,1 +1,1 @@
-export { PayoutHelper } from './PayoutHelper'
+export { PayoutHelper } from './PayoutHelper';

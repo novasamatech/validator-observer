@@ -1,1 +1,1 @@
-export * from './Referendum'
+export * from './Referendum';

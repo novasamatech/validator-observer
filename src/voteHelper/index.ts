@@ -1,1 +1,1 @@
-export { VoteHelper } from "./VoteHelper"; 
+export { VoteHelper } from './VoteHelper';

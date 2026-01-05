@@ -1,16 +1,15 @@
-import { Keyring } from '@polkadot/keyring'
+import { Keyring } from '@polkadot/keyring';
 
 export class Sender {
-    private mnemonic: string
+  private mnemonic: string;
 
-    constructor(mnemonic: string) {
-        this.mnemonic = mnemonic
-    }
+  constructor(mnemonic: string) {
+    this.mnemonic = mnemonic;
+  }
 
-    generateKeyringPair(): any {
-        const keyring = new Keyring();
-        const pair = keyring.createFromUri(this.mnemonic, undefined, 'sr25519');
-        return pair;
-    }
-
+  generateKeyringPair(): any {
+    const keyring = new Keyring();
+    const pair = keyring.createFromUri(this.mnemonic, undefined, 'sr25519');
+    return pair;
+  }
 }
