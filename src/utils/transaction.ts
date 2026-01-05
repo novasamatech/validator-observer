@@ -65,7 +65,7 @@ export async function sendTransaction(transaction: any, sender: any, api: any): 
     };
 
     transaction
-      .signAndSend(sender, (result: any) => {
+      .signAndSend(sender, { era: 256 }, (result: any) => {
         const { status, events } = result;
         console.log(`Current status is ${status}`);
 
