@@ -1,1 +1,1 @@
-export * from './SubstrateConnection'
+export * from './SubstrateConnection';

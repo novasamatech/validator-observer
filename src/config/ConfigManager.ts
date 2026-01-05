@@ -1,4 +1,4 @@
-import { RelaychainConfig, AstarConfig, Config, KiltConfig } from './conf'
+import { RelaychainConfig, AstarConfig, Config, KiltConfig } from './conf';
 
 /**
  * Function to manage the configuration of the network.
@@ -8,15 +8,16 @@ import { RelaychainConfig, AstarConfig, Config, KiltConfig } from './conf'
  * @throws {Error} - Throws an error if no networks are found for the given type.
  */
 export function configManager(networkType: string, config: Config) {
-    const filteredNetworks = config.networks.filter(network => 
-        (networkType === 'Relaychain' && network instanceof RelaychainConfig) ||
-        (networkType === 'Astar' && network instanceof AstarConfig) || 
-        (networkType === 'Kilt' && network instanceof KiltConfig)
-    );
+  const filteredNetworks = config.networks.filter(
+    network =>
+      (networkType === 'Relaychain' && network instanceof RelaychainConfig) ||
+      (networkType === 'Astar' && network instanceof AstarConfig) ||
+      (networkType === 'Kilt' && network instanceof KiltConfig),
+  );
 
-    if (filteredNetworks.length === 0) {
-        throw new Error(`No networks found for type: ${networkType}`);
-    }
+  if (filteredNetworks.length === 0) {
+    throw new Error(`No networks found for type: ${networkType}`);
+  }
 
-    return filteredNetworks;
+  return filteredNetworks;
 }
