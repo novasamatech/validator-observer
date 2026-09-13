@@ -25,7 +25,7 @@ async function main(): Promise<void> {
 
   for (const network of filteredNetworks) {
     // Create connection
-    const connection = new SubstrateConnection(network.endpoint);
+    const connection = new SubstrateConnection(network.endpoints);
     await connection.connect();
     connections[network.name] = connection;
     console.log(`Connected to ${network.name} network`);
