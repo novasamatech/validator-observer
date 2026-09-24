@@ -44,43 +44,9 @@ export class RelaychainConfig extends BaseNetworkConfig {
 }
 
 /**
- * Class for Astar network configuration.
- */
-export class AstarConfig extends BaseNetworkConfig {
-  validators: Validator[];
-
-  /**
-   * @param {string} name - The name of the network.
-   * @param {string[]} endpoints - The endpoints of the network in failover priority order.
-   * @param {Validator[]} validators - The validators of the network.
-   */
-  constructor(name: string, endpoints: string[], validators: Validator[]) {
-    super(name, endpoints);
-    this.validators = validators;
-  }
-}
-
-/**
- * Class for Kilt network configuration.
- */
-export class KiltConfig extends BaseNetworkConfig {
-  validators: Validator[];
-
-  /**
-   * @param {string} name - The name of the network.
-   * @param {string[]} endpoints - The endpoints of the network in failover priority order.
-   * @param {Validator[]} validators - The validators of the network.
-   */
-  constructor(name: string, endpoints: string[], validators: Validator[]) {
-    super(name, endpoints);
-    this.validators = validators;
-  }
-}
-
-/**
  * Type for Network configuration.
  */
-export type NetworkConfig = RelaychainConfig | AstarConfig;
+export type NetworkConfig = RelaychainConfig;
 
 /**
  * Class for the main configuration.
@@ -224,29 +190,12 @@ export const config = new Config(
           voteEnabled: false,
           identity: '🌌Novasama🌌/von Neumann',
         },
-      ],
-    ),
-    new AstarConfig(
-      'Astar',
-      ['wss://astar.api.onfinality.io/ws?apikey=8422f83b-f495-4e4b-b3f5-1d1c88a3f940'],
-      [
         {
-          address: 'X4Hsp6EcxNPypWidz4xuVJhoafLdpShzy5ADpLAJZdqeKwz',
-          votersAccounts: [],
-          voteAmount: 0,
+          address: '1ZpVkx318mQBTBpqdWLGc1b3eygwVmdp3BJmTfowHL5kr6r',
+          votersAccounts: ['15cfSaBcTxNr8rV59cbhdMNCRagFr3GE6B3zZRsCp4QHHKPu'],
+          voteAmount: 1,
           voteEnabled: false,
-        },
-      ],
-    ),
-    new KiltConfig(
-      'Kilt',
-      ['wss://spiritnet.kilt.io'],
-      [
-        {
-          address: '4sPMk6DgLbaYHaDKWpwFJQVBv3GupqHJRFWngHeALUrv37x9',
-          votersAccounts: [],
-          voteAmount: 0,
-          voteEnabled: false,
+          identity: '🌌Novasama🌌/Lovelace',
         },
       ],
     ),

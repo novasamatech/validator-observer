@@ -5,8 +5,6 @@
   "main": "App.ts",
   "scripts": {
     "start:relaychain": "ts-node src/App.ts 'Relaychain'",
-    "start:astar": "ts-node src/App.ts 'Astar'",
-    "start:kilt": "ts-node src/App.ts 'Kilt'",
     "fmt": "prettier --write ./src",
     "typecheck": "tsc --noEmit"
   },

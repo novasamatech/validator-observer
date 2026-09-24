@@ -1,7 +1,7 @@
-import { BaseNetworkConfig, RelaychainConfig, AstarConfig, KiltConfig } from '../config/conf';
+import { BaseNetworkConfig, RelaychainConfig } from '../config/conf';
 import { SubstrateConnection } from '../connection';
 import { PayoutHelper } from './PayoutHelper';
-import { AstarPayoutHelper, KiltPayoutHelper, RelychainPayoutHelper } from './payouters';
+import { RelychainPayoutHelper } from './payouters';
 
 /**
  * Function to get the appropriate PayoutHelper based on the network configuration.
@@ -13,10 +13,6 @@ import { AstarPayoutHelper, KiltPayoutHelper, RelychainPayoutHelper } from './pa
 export function getPayoutHelper(config: BaseNetworkConfig, connection: SubstrateConnection): PayoutHelper {
   if (config instanceof RelaychainConfig) {
     return new RelychainPayoutHelper(connection);
-  } else if (config instanceof AstarConfig) {
-    return new AstarPayoutHelper(connection);
-  } else if (config instanceof KiltConfig) {
-    return new KiltPayoutHelper(connection);
   } else {
     throw new Error(`Unsupported network: ${config.name}`);
   }

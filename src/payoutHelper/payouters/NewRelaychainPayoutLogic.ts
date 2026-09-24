@@ -32,35 +32,45 @@ export class NewRelaychainPayoutLogic extends PayoutHelper {
 
   /**
    * Collects transactions for unclaimed rewards for validators within a specified era range.
+   * Exposure is paged (up to MaxExposurePageSize nominators per page) and every page has to be
+   * claimed separately, so a transaction is added for each page that is not yet claimed.
    * @param startEra The starting era from which to collect unclaimed rewards.
    * @param lastClaimableEra The last era eligible for payout.
    * @param validators An array of validators for whom to check unclaimed rewards.
    * @param transactions An array to which the payout transactions will be added.
+   * @returns Unclaimed pages per era for every validator.
    */
   private async collectTransactionsForUnclaimedRewards(
     startEra: number,
     lastClaimableEra: number,
     validators: Validator[],
     transactions: Array<SubmittableExtrinsic<any, any>>,
-  ): Promise<Map<string, Set<number>>> {
-    const payoutPlan = new Map<string, Set<number>>();
+  ): Promise<Map<string, Map<number, number[]>>> {
+    const payoutPlan = new Map<string, Map<number, number[]>>();
 
     for (const validator of validators) {
-      payoutPlan.set(validator.address, new Set());
+      payoutPlan.set(validator.address, new Map());
     }
 
     for (let era = startEra; era <= lastClaimableEra; era++) {
       for (const validator of validators) {
-        const eraStakersOverview =
-          (await this.api.query.staking.erasStakersOverview(era, validator.address)).toJSON() || {};
-        if (Object.keys(eraStakersOverview).length === 0) continue;
+        const eraStakersOverview = await this.api.query.staking.erasStakersOverview(era, validator.address);
+        if (eraStakersOverview.isNone) continue;
 
-        const claimedPages = (await this.api.query.staking.claimedRewards(era, validator.address)).toJSON();
-        // @ts-ignore
-        if (!claimedPages || claimedPages.length === 0) {
-          payoutPlan.get(validator.address)!.add(era);
-          const transaction = this.api.tx.staking.payoutStakers(validator.address, era);
-          transactions.push(transaction);
+        const pageCount = eraStakersOverview.unwrap().pageCount.toNumber();
+        const claimedPages = new Set(
+          (await this.api.query.staking.claimedRewards(era, validator.address)).map(page => page.toNumber()),
+        );
+
+        const unclaimedPages: number[] = [];
+        for (let page = 0; page < pageCount; page++) {
+          if (claimedPages.has(page)) continue;
+          unclaimedPages.push(page);
+          transactions.push(this.api.tx.staking.payoutStakersByPage(validator.address, era, page));
+        }
+
+        if (unclaimedPages.length > 0) {
+          payoutPlan.get(validator.address)!.set(era, unclaimedPages);
         }
       }
     }
@@ -68,14 +78,14 @@ export class NewRelaychainPayoutLogic extends PayoutHelper {
     return payoutPlan;
   }
 
-  private logPayoutPlan(payoutPlan: Map<string, Set<number>>): void {
+  private logPayoutPlan(payoutPlan: Map<string, Map<number, number[]>>): void {
     for (const [validator, eras] of payoutPlan) {
-      const eraList = Array.from(eras);
-      if (eraList.length === 0) {
+      if (eras.size === 0) {
         console.log(`Payout plan for validator ${validator}: no unclaimed eras`);
         continue;
       }
-      console.log(`Payout plan for validator ${validator}: eras ${eraList.join(', ')}`);
+      const eraList = Array.from(eras, ([era, pages]) => `${era} (pages ${pages.join(', ')})`);
+      console.log(`Payout plan for validator ${validator}: eras ${eraList.join('; ')}`);
     }
   }
 
