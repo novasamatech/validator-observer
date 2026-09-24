@@ -1,4 +1,4 @@
-import { RelaychainConfig, AstarConfig, Config, KiltConfig } from './conf';
+import { RelaychainConfig, Config } from './conf';
 
 /**
  * Function to manage the configuration of the network.
@@ -9,10 +9,7 @@ import { RelaychainConfig, AstarConfig, Config, KiltConfig } from './conf';
  */
 export function configManager(networkType: string, config: Config) {
   const filteredNetworks = config.networks.filter(
-    network =>
-      (networkType === 'Relaychain' && network instanceof RelaychainConfig) ||
-      (networkType === 'Astar' && network instanceof AstarConfig) ||
-      (networkType === 'Kilt' && network instanceof KiltConfig),
+    network => networkType === 'Relaychain' && network instanceof RelaychainConfig,
   );
 
   if (filteredNetworks.length === 0) {
